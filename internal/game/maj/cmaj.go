@@ -6,10 +6,10 @@ import (
 
 	"strconv"
 
+	"qianuuu.com/lib/logs"
 	"qianuuu.com/xgmj/internal/config"
 	"qianuuu.com/xgmj/internal/consts"
 	. "qianuuu.com/xgmj/internal/mjcomn"
-	"qianuuu.com/lib/logs"
 )
 
 // CMaj 单个玩家牌管理对象
@@ -1127,6 +1127,213 @@ func (cmaj *CMaj) Check_SIHUO() int {
 //	return true
 //}
 
+//混一色检测
+func (cmaj *CMaj) Check_HYS() bool {
+	xuCt := 0
+	ziCt := 0
+	WanCt := 0
+	TongCt := 0
+	TiaoCt := 0
+	ZfbCt := 0
+	FengCt := 0
+	AllPai := cmaj.GetAllPai()
+	for _, v := range AllPai {
+		if v.GetColor() == Color_Wan {
+			WanCt++
+		}
+		if v.GetColor() == Color_Tong {
+			TongCt++
+		}
+		if v.GetColor() == Color_Tiao {
+			TiaoCt++
+		}
+		if v.GetColor() == Color_Zfb {
+			ZfbCt++
+		}
+		if v.GetColor() == Color_Feng {
+			FengCt++
+		}
+	}
+
+	if WanCt > 0 {
+		xuCt++
+	}
+	if TongCt > 0 {
+		xuCt++
+	}
+	if TiaoCt > 0 {
+		xuCt++
+	}
+	if ZfbCt > 0 {
+		ziCt++
+	}
+	if FengCt > 0 {
+		ziCt++
+	}
+	if xuCt == 1 && ziCt != 0 {
+		return true
+	}
+	return false
+}
+
+//大三元检测
+func (cmaj *CMaj) Check_DSY() bool {
+
+	// 中发白都为3张 ，包括碰牌
+	zhongCt := 0
+	faCt := 0
+	baiCt := 0
+	card_zhong := NewMCard(124)
+	card_fa := NewMCard(128)
+	card_bai := NewMCard(132)
+
+	allCards := cmaj.GetAllPai()
+
+	for _, v := range allCards {
+		if v.Equal(card_zhong) {
+			zhongCt++
+		}
+		if v.Equal(card_fa) {
+			faCt++
+		}
+		if v.Equal(card_bai) {
+			baiCt++
+		}
+
+	}
+
+	if zhongCt == 3 && faCt == 3 && baiCt == 3 {
+		return true
+	}
+	return false
+}
+
+//返回手牌中数量最多的花色
+func (cmaj *CMaj) MostColor() int {
+	wan := len(cmaj.HandPaiArr[0])
+	tong := len(cmaj.HandPaiArr[1])
+	tiao := len(cmaj.HandPaiArr[2])
+	if wan > tong && wan > tiao {
+		return 0
+	}
+	if tong > wan && tong > tiao {
+		return 1
+	}
+	if tiao > wan && tiao > tong {
+		return 2
+	}
+	return 0
+}
+
+//清幺九检测
+
+func (cmaj *CMaj) Check_QYJ() bool {
+	//全是1和9 不计对对胡,碰牌算
+	allCards := cmaj.GetAllPai()
+
+	for _, v := range allCards {
+		if v.GetValue() != 9 && v.GetValue() != 1 {
+			return false
+		}
+	}
+	return true
+}
+
+//四杠
+func (cmaj *CMaj) Check_SIGANG() bool {
+
+	//玩家杠了四次
+	if cmaj.GetGangCt()/4 > 3 {
+		return true
+	}
+	return false
+}
+
+//九连宝灯
+func (cmaj *CMaj) Check_JLBD() bool {
+	//由一种花色序数牌按１１１２３４５６７８９９９组成的特定排型，见同花色任何一张序数牌极为糊牌。不计清一色。
+	//可以听该门花色的任何一张牌
+	MostCards := cmaj.HandPaiArr[cmaj.MostColor()]
+	valueOneCt := 0
+	valueNineCt := 0
+
+	for i := 1; i < 10; i++ {
+		isHas := false
+		for _, v := range MostCards {
+			if v.GetValue() == i {
+				isHas = true
+			}
+		}
+
+		if isHas {
+
+		} else {
+			return false
+		}
+	}
+	for _, v := range MostCards {
+		if v.GetValue() == 1 {
+			valueOneCt++
+		}
+		if v.GetValue() == 10 {
+			valueNineCt++
+		}
+	}
+	if valueOneCt >= 3 && valueNineCt >= 3 {
+		return true
+	}
+	return false
+}
+
+//绿一色检测
+func (cmaj *CMaj) Check_LYS() bool {
+
+	//手上的牌全是绿的 不计混一色
+	allCards := cmaj.GetAllPai()
+	card_fa := NewMCard(128)
+	for _, v := range allCards {
+		if v.GetColor() != Color_Tiao && !v.Equal(card_fa) {
+			return false
+		}
+	}
+	return true
+}
+
+//大四喜检测
+func (cmaj *CMaj) Check_DSX() bool {
+	// 东南西北 都是大于等于3张的，包括碰杠
+	dongCt := 0
+	nanCt := 0
+	xiCt := 0
+	beiCt := 0
+	card_Dong := NewMCard(108)
+	card_Nan := NewMCard(112)
+	card_Xi := NewMCard(116)
+	card_Bei := NewMCard(120)
+
+	allCards := cmaj.GetAllPai()
+
+	for _, v := range allCards {
+		if v.Equal(card_Dong) {
+			dongCt++
+		}
+		if v.Equal(card_Nan) {
+			nanCt++
+		}
+		if v.Equal(card_Xi) {
+			xiCt++
+		}
+		if v.Equal(card_Bei) {
+			beiCt++
+		}
+	}
+
+	if dongCt >= 3 && nanCt >= 3 && xiCt >= 3 && beiCt >= 3 {
+		return true
+	}
+	return false
+}
+
 //检测 门清：没有碰过牌,没有杠
 func (cmaj *CMaj) Check_MQ() bool {
 
@@ -1330,8 +1537,8 @@ func (cmaj *CMaj) Check_YiBanGao(_calHuInfo *CalHuInfo) int {
 				if _calHuInfo.CheckAABBCCPai_hy(v[i], v[i+1], v[i+2], v[i+3], v[i+4], v[i+5]) &&
 					GetVal(v[i]) == GetVal(v[i+3]) && GetVal(v[i+1]) == GetVal(v[i+4]) && GetVal(v[i+2]) == GetVal(v[i+5]) {
 					logs.Info("------%v,%v,%v,%v,%v,%v,", v[i], v[i+1], v[i+2], v[i+3], v[i+4], v[i+5])
-						ybgct++
-						return ybgct
+					ybgct++
+					return ybgct
 
 				} else {
 					i += 3
