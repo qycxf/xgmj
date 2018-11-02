@@ -1,0 +1,88 @@
+// protoc --go_out=. *.proto
+
+package protobuf;
+
+// 请求命令
+message RequestCmd {
+	required ReqHead head = 1;	                // 请求头
+	optional ReqSimple simple = 2;          	// 简单消息
+	optional ReqCreateTalble crateTable = 3;    // 创建牌桌
+
+}
+
+// 请求头内容
+message ReqHead {
+	required int32 uid = 1; 	// 玩家 id
+	required int32 msgID = 2;	// 消息 id
+    required string app = 3;	// app 名称
+    optional string hallMsg = 4;	// hall 消息
+}
+
+// 简单消息
+message ReqSimple {
+	required SimpleTag tag = 1;     // 消息类型
+	optional int32 intValue = 2;	// int 消息数值
+	optional string strValue = 3;	// str 消息数值
+	optional int32 valiNum = 4;  	// 随机数验证
+
+	enum SimpleTag {
+    	LOGIN_GAME = 1;		    // 登陆游戏
+		PLAYER_INFO = 2;		// 请求玩家信息
+		QUICK_START = 3;		// 快速开始
+		ROOT_LIST = 4;			// 获取房间列表
+        ENTER_TABLE = 5;		// 进入房间桌子
+		READY = 6;				// 玩家准备
+		EXIT_TABLE = 7;			// 离开桌子
+		PLAYER_OPT = 8;			// 玩家操作
+		EXIT_GAME = 9;			// 退出游戏
+		CHANGE_TABLE = 10;		// 换桌子
+		TABLE_CHAT = 11;		// 牌桌聊天
+		WORLD_CHAT = 12;		// 世界聊天
+		HEART_BEAT = 13;		// 游戏心跳
+		GAME_CHARGE = 14;		// 充值
+		GAME_BUY = 15;		 	// 购买
+		WATCH_PLAYER_INFO = 16;	// 查看玩家信息
+		GET_RANK_LIST = 17;		// 获取游戏排行列表 1:金币排行 2:今日赢取
+		SELECT_QUE = 18;		// 选缺 0万 1筒 2条
+		REQ_DISMISS = 19;		// 请求解散房间
+		RESP_DISMISS = 20;		// 响应退桌(同意1 不同意 0)
+		OFFLINE = 21;		    // 玩家断线
+		REQ_STOP = 22;          // 程序后台运行
+		ZHANJI_LIST = 23;       // 玩家战绩列表
+		SEND_CARD = 24;         // 赠送房卡
+		TABLEINFO_REC = 25;     // 牌局回放数据请求
+		ZHANJI_LIST_DETAIL = 26;// 玩家战绩详细
+		FANGKA_LIST = 27;       // 房卡列表
+
+	}
+}
+
+// 创建牌桌
+message ReqCreateTalble {
+
+	required int32 tableType = 1;	// 桌子类型 1:合肥麻将 2:红中麻将
+	required int32 playerCt = 2;   	// 玩家数
+	required int32 gameCt = 3;   	// 游戏局数(4局	8局	16局	 32局)
+	optional int32 baseScore = 4;	// 牌局底分(合肥麻将牌开嘴数)
+	optional int32 robotCt = 5;	    // 测试机器人数
+    optional int32 dianpaoHu = 6;	// 点炮胡
+    optional int32 zimoHu = 7;	    // 自摸胡
+    optional int32 tiandiHu = 8;	// 天地胡
+    optional int32 kehuQidui = 9;	// 可胡七对
+    optional int32 qiangGang = 10;	// 可抢杠
+    optional int32 zhuaNiaoCt = 11;	// 抓鸟数 (红中麻将 4码,6码)
+    optional int32 yiMaQuanZh = 12;	// 抓鸟方式: 一码全中
+    optional int32 menQing = 13;	// 门清
+    optional int32 present = 14;	// 是否是赠送房间
+    optional int32 tdqZuiCt = 15;	// 合肥麻将,天地胡\清一色嘴数
+    optional int32 kePengGang = 16;	// 红中麻将,可碰杠
+	optional int32 kaiHuSuanGang = 17;	// 阜阳麻将,开胡算杠
+	optional int32 youGangYouFen = 18;	// 阜阳麻将,有杠有分(没荒庄)
+	optional int32 daiHua = 19;	    // 蚌埠麻将是否带花
+	optional int32 fengLing = 20;	// // 怀远麻将风令选项
+	optional int32 baoTing = 21;	// // 怀远麻将报听选项
+	optional int32 wuHuaGuo = 22;	// // 怀远麻将无花果
+    optional int32 PayWay = 23;      //付费方式
+
+}
+

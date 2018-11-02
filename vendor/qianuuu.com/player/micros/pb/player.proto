@@ -1,0 +1,58 @@
+// protoc --go_out=plugins=grpc:. player.proto
+
+syntax = "proto3";
+
+package pb;
+
+service PlayerService {
+	rpc SayHello (SimpleRequest) returns (SimpleReply) {}
+	rpc CheckToken(SimpleRequest) returns (SimpleReply) {}
+	rpc UserInfo (SimpleRequest) returns (User) {}
+	rpc AddTableRecord(TableRecordRequest) returns (SimpleReply) {}
+	
+	rpc ConsumeGoods(ConsumeRequest) returns (SimpleReply) {}
+	rpc ConsumeGoodsLoss(SimpleRequest) returns (SimpleReply) {}	
+	rpc MultiConsumeGoods(ConsumeRequest) returns (SimpleReply) {}
+	rpc EarnGoods(ConsumeRequest) returns (SimpleReply) {}
+
+	rpc ChargeCoin(SimpleRequest) returns (SimpleReply) {}	
+	rpc WinLossCoin(SimpleRequest) returns (SimpleReply) {}	
+	rpc MultiWinLossCoin(SimpleRequest) returns (SimpleReply) {}	
+	
+	rpc GetTableID(SimpleRequest)  returns (SimpleReply) {}
+	rpc PutTableID(SimpleRequest)  returns (SimpleReply) {}	
+}
+
+message SimpleRequest {
+	int32 intVal = 1;
+	string strVal = 2;
+}
+
+message SimpleReply {
+	int32 intVal = 1;
+	string strVal = 2;
+}
+
+message User {
+	int32 uid = 1;
+	string nickname = 2;
+	string goods = 3;
+}
+
+message ConsumeRequest {
+	int32 uid = 1;			// 用户 id
+	string goodType = 2;	// 消耗物品类型
+	int32 count = 3;		// 消耗个数
+	string detail = 4;		// 操作详情
+	repeated int32 uids = 5;	// 多人 id
+}
+
+message TableRecordRequest {
+	string appname = 1;
+	int32 tableid = 2;
+	int32 inning = 3;
+	string uids = 4;
+	string scores = 5;
+	string misc = 6;
+	bytes zdata = 7;
+}

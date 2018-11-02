@@ -1,0 +1,294 @@
+// protoc --go_out=. *.proto
+
+package protobuf;
+
+// 响应命令
+message ResponseCmd {
+	required RespHead head = 1;                // 响应头消息
+	optional RespSimple simple = 2;		       // 简单消息
+	optional PlayerInfo playerInfo = 3;        // 玩家信息
+	optional TableInfo tableInfo = 4;          // 桌子信息
+	optional ChatInfo chatInfo = 5;            // 牌桌聊天信息
+	optional WordChat wordChat = 6;            // 世界聊天信息
+	repeated GameRecord gameRecord=7;          // 游戏记录
+}
+
+// 响应头定义
+message RespHead {
+	required int32 uid = 1;		// 玩家 ID
+	required int32 msgID = 2;	// 消息 ID
+    required string app = 3;	// app 名称
+    optional string hallMsg = 4;	// hall 消息
+	required int32 respIDs = 5;	// 包含所有的响应标记
+	required int32 result = 6;	// 响应结果 0: 成功 <0: 失败
+	optional string tip = 7;	// 响应提示消息
+}
+
+// 简单消息，不带数据的操作
+message RespSimple {
+	required SimpleTag tag = 1;		// 消息标记
+	optional int32 intValue = 2;	// int 消息数值
+    optional string strValue = 3;	// str 消息数值
+    repeated int32 intArr = 4;      // int 数组
+    repeated string strArr = 5;     // str 数组
+
+	enum SimpleTag {
+       ENTER_TABLE = 1;		           // 进入房间桌子
+       TOP_TIP = 2;		               // 游戏顶部提示语
+       KICK_OUT = 3;		           // 踢出桌子消息
+       DISMISS_TABLE = 4;              // 解散房间信息(intArr  0-3:4个位置状态 0-等待 1-同意 2-不同意; 4:申请人位置)
+       DISMISS_RESULT = 5;             // 解散房间结果, intValue 1:同意 0:拒绝
+       WIN_TIP_S = 6;		           // 窗口提示(小)
+       WIN_TIP_M = 7;		           // 窗口提示(中)
+       PRESENT_SUCC = 8;		       // 赠送房间成功
+	}
+}
+
+
+// 房间信息
+message RoomInfo {
+	required int32 roomId = 1;		// 房间 id
+	required string roomName = 2;   // 房间 名称
+	required string baseMoney = 3;	// 房间 底注
+	required string minMoney = 4;	// 最小带入
+	required int32 playerNum = 5;	// 在玩人数
+	repeated string raiseChip = 6;  // 可用加注数
+}
+
+// 玩家信息
+message PlayerInfo {
+	required int32 uid = 1;		    // 玩家 id
+	required string nickName = 2;   // 玩家昵称
+}
+
+//座位信息
+message SeatInfo
+{
+  optional PlayerInfo playerInfo = 1;
+  required int32 seatId = 2;         //座位号
+  required int32 state = 3;          //当前状态
+  optional string uuid = 4;          //牌桌游戏uuid
+  repeated int32 handCards = 5;      //手牌值
+  repeated int32 outCards = 6;       //打出的牌值
+  repeated PGInfo pgInfos = 7 ;      //碰\杠牌信息
+  optional SeatOpts seatOpts = 8;    //位置思考可用操作
+  repeated int32 threeCards = 9;     //牌桌换三张状态,系统推荐的三张牌
+  repeated int32 queSystem = 10;     //牌桌选缺状态,系统推荐的缺
+  optional int32 queSelect = 11;     //位置实际选的缺
+  repeated int32 score = 12;         //当前积分数,第一位为符号位,第二位为值
+  repeated int32 selectCards = 13;   //玩家已选的三张牌
+  optional int32 huType = 14;        //如果位置已经胡牌,记录胡牌类型
+  optional int32 offline = 15;       //位置当前是否离线
+  optional int32 huseq = 16;         //如果位置已经胡牌,记录胡牌顺序
+  repeated int32 tingCards= 17;      //如果位置已经听牌,记录当前所听牌
+  optional int32 buHuaCt = 18;       //记录当前玩家的补花花数
+  repeated int32 huaCards = 19;      //打出花牌值
+  optional bool tingPai = 20;        //是否报听
+
+}
+
+//座位可操作信息
+message SeatOpts
+{
+ optional bool peng = 1;               //是否可碰
+ optional bool gang = 2;               //是否可杠
+ optional bool hu = 3;                 //是否可胡
+ optional bool chi = 4;                //是否可吃
+ optional bool bu = 5;                 //是否可补张
+ optional bool cancer = 6;             //是否可取消
+
+ repeated int32 pengCard = 7;          //可碰牌值 最大2个值
+ repeated int32 gangCard = 8;          //可杠牌值 最大3个值
+ optional int32 huCard = 9;            //可胡牌值 最大1个值
+ repeated int32 chiCard = 10;          //可吃牌值 3个为一组 最大9个值
+ repeated int32 buCard = 11;           //可补张牌值 最大3个值
+
+ optional bool ting = 12;                //是否可报听
+}
+
+
+//碰杠吃牌信息
+message PGInfo
+{
+  required int32 type = 1;         //类型 1:碰  2:明杠 3:暗杠
+  repeated int32 cards =2 ;        //3~4张牌
+}
+
+
+//座位出牌提示信息
+message SendTip
+{
+ required int32 sendCard = 1;   //打出的牌
+ repeated int32 huCards = 2;    //如果打出这张 对应能胡的牌
+ repeated int32 huScores = 3;   //对应能胡的牌 胡的番数或积分
+ repeated int32 remainCt = 4;   //对应能胡的牌 桌面剩余张数
+}
+
+//桌子信息
+message TableInfo
+{
+  optional int32  roomID = 1;            //房间id
+  required int32  tableID = 2;           //桌子id
+  optional string tableName = 3;         //桌子名称
+  required int32  reaminTime =4;         //游戏倒计时剩余时间
+  required int32  state = 5;             //桌子状态
+  optional string uuid = 6;              //每局游戏标志
+  repeated SeatInfo seatInfo = 7;        //位置信息
+  optional int32 curtSpeaker= 8;         //当前说话人位置
+  optional ExecOpt execOpt = 9;          //执行座位操作信息
+  optional int32  dSeatID = 10;          //庄家位置id
+  optional int32 remainCt = 11;          //剩余张数
+  optional int32   flow = 12;            //牌局结束,是否流局
+  repeated SeatResult resultList =13;    //位置结束信息
+  repeated SeatResult  gameResult = 14;  //房间游戏最终结果
+  optional int32 gameCt = 15;	         //已玩局数
+  optional int32 fangSeatID = 16;	     //房主位置
+  optional int32 lastSendCard = 17;	     //当前牌桌最近一个玩家打出的牌
+  repeated GameResult totalResult = 18;  //牌局游戏最终结果
+  repeated ScoreChange scoreChange=19 ;  //位置积分变化信息
+  optional TableCfg tableCfg  =20 ;      //桌子配置信息
+  optional ZhuaNiaoInfo zhuaNiaoInfo =21;//抓鸟信息
+  optional int32 tableTime = 22;         //时间戳
+  optional int32 lianZhuangCt = 23;	     //合肥麻将,庄家连庄数
+  repeated SendTip sendTipArr =24;       //如果牌桌为等待出牌,则发送出牌提示
+  optional int32 presenterId = 25;       //赠送房间者id
+  optional string presenterName = 26;    //赠送房间者昵称
+  optional int32 valiNum = 27;           //随机数验证
+  optional int32 lastCardData = 28;      //阜阳麻将牌桌显示最后一张牌
+
+}
+
+//抓鸟信息
+message ZhuaNiaoInfo
+{
+  repeated int32 niaoCardArr = 1 ;   //1~2 张鸟牌
+  repeated int32 zhongNiaoArr =2 ;   //按座位序号 存储中鸟数
+}
+
+//执行座位操作信息
+message ExecOpt
+{
+ optional int32 optSeatId = 1;          //操作位置
+ optional int32 optType = 2;            //操作类型
+ optional int32 optData = 3;            //操作对应的牌值
+ optional int32 optDetail = 4;          //操作详细类型
+ optional int32 dianPaoSeatId = 5;      //点炮位置
+ repeated int32 hupxIdArr       = 6;    //胡牌牌型Id数组
+}
+
+//桌子配置信息
+message TableCfg
+{
+	required int32 tableType = 1;	// 桌子类型 1:合肥麻将 2:红中麻将
+	required int32 playerCt = 2;   	// 玩家数
+	required int32 gameCt = 3;   	// 游戏局数(4局	8局	16局	 32局)
+	optional int32 baseScore = 4;	// 牌局底分
+	optional int32 robotCt = 5;	    // 测试机器人数
+    optional int32 dianpaoHu = 6;	// 点炮胡
+    optional int32 zimoHu = 7;	    // 自摸胡
+    optional int32 tiandiHu = 8;	// 天地胡
+    optional int32 kehuQidui = 9;	// 可胡七对
+    optional int32 qiangGang = 10;	// 可抢杠
+    optional int32 zhuaNiaoCt = 11;	// 抓鸟数 (红中麻将 2码,4码,6码)
+    optional int32 yiMaQuanZh = 12;	// 抓鸟方式: 一码全中
+    optional int32 menQing = 13;	// 门清
+    optional int32 present = 14;	// 是否是赠送房间
+    optional int32 tdqZuiCt = 15;	// 合肥麻将,天地胡\清一色嘴数
+    optional int32 kePengGang = 16;	// 红中麻将,可碰杠
+    optional int32 kaiHuSuanGang = 17;	// 阜阳麻将,开胡算杠
+    optional int32 youGangYouFen = 18;	// 阜阳麻将,有杠有分(没荒庄)
+    optional int32 createrId = 19 ; // 创建房间者id
+    optional int32 daiHua = 20;	    // 蚌埠麻将是否带花
+    optional int32 fengLing = 21;	// 怀远麻将风令选项
+    optional int32 baoTing = 22;	// // 怀远麻将报听选项
+    optional int32 wuHuaGuo = 23;	// // 怀远麻将报听无花果
+    optional int32 PayWay = 24;      //付费方式
+
+}
+
+//积分变化信息
+message ScoreChange
+{
+  required int32 seatID = 1;         //位置id
+  required int32 sign =2 ;           //符号
+  required int32 value =3 ;          //变化数量
+}
+
+//位置结算信息
+message SeatResult
+{
+ required int32  seatID = 1;            //位置id
+ required int32  isWinner = 2;          //是否赢家
+ repeated string pxInfo =3;             //牌型描述信息,列表
+ optional int32  fanCt =4;              //番数
+ optional int32  score =5;              //本局积分数(赢家为正,非赢家为负)
+ optional int32  huSeq =6;              //记录胡牌顺序
+}
+
+//位置游戏结算信息
+message GameResult
+{
+ required int32  seatID = 1;               //位置id
+ optional int32  zimo = 2;                 //自摸次数
+ optional int32  jiepao = 3;               //接炮次数
+ optional int32  dianpao = 4;              //点炮次数
+ optional int32  angang = 5;               //暗杠次数
+ optional int32  minggang = 6;             //明杠次数
+ optional int32  chadajiao = 7;            //查大叫
+ optional int32  chahuazhu = 8;            //查花猪
+ optional int32  isWinner = 9;             //是否赢家
+ optional int32  score = 10;               //总分数
+ optional int32  maxWinner = 11;           //是否大赢家
+ optional int32  maxPaoshou = 12;          //是否最佳炮手
+
+}
+
+
+//牌桌聊天
+message ChatInfo
+{
+  required int32   seatID = 1;    //座位id
+  required string  content = 2;   //聊天内容
+}
+
+//世界聊天
+message WordChat
+{
+  required int32   uID = 1;         //玩家id
+  required string  nickName = 2;    //玩家昵称
+  required int32   type = 3;        //聊天类型 1:系统 2:玩家
+  required string  content = 4;     //聊天内容
+}
+
+
+
+//战绩信息
+message GameRecord
+{
+  required int32   id = 1;         //数据id
+  required int32   tableId = 2;    //牌桌id
+  required int32   recTime = 3;    //对战时间
+  repeated GameRecItem grItems=4;  //四个位置分数信息
+}
+
+//战绩信息item
+message GameRecItem
+{
+    required string  nickName = 1;     //玩家昵称
+    repeated int32   score = 2;        //分数 0:分数 1:符号 1正0负
+}
+
+//牌局回放数据
+message RespTableInfoRec
+{
+  required int32 tableId = 1;                //桌子id
+  required int32 sequence =2 ;               //局数
+  repeated TableInfo tableInfoArr =3 ;       //TableInfo 数组
+}
+
+
+//转发外部消息数据
+message OuterMsg
+{
+  required string content = 1;  //消息内容
+}

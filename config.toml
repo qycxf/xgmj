@@ -1,0 +1,49 @@
+# 游戏配置
+
+# 游戏端口号
+# 游戏配置
+
+# 游戏端口号
+AppName = "bbmj"
+RPCUrl = "test.qianuuu.cn:8507"
+ReceiveRdds = "test.qianuuu.cn:7509"
+HallRdds = "test.qianuuu.cn:7509"
+LogPath = ""
+LogLevel = "debug"
+
+# game config 游戏调试开关控制,线上的全为 true --------------------------------------------------------
+
+OpenHeart = true
+OpenDb = true
+OpenHu = true
+OpenPeng = true
+OpenGang = true
+OpenReConnect = true
+OpenCharge = false
+
+CloseAutoRobot = true
+CloseTest = true
+CloseTestPx = false
+
+
+
+#合肥麻将,底分选择
+SelectScoreCt = [5, 10, 15]
+SelectTdqZuiCt= [20, 50, 100]
+
+
+
+#创建房间局数	         8局	    16局
+#所需房卡数            4	    8
+#所需房卡数(平摊)  	 1/人	2/人
+
+
+[[RoomCards]]
+GameCt = 8
+NeedCard = 1
+AvgPerCard = 1
+
+[[RoomCards]]
+GameCt = 16
+NeedCard = 2
+AvgPerCard = 2
