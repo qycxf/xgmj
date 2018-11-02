@@ -1,8 +1,8 @@
 package protoapi
 
 import (
-	"qianuuu.com/ahmj/internal/game/table"
-	"qianuuu.com/ahmj/internal/protobuf"
+	"qianuuu.com/xgmj/internal/game/table"
+	"qianuuu.com/xgmj/internal/protobuf"
 	"qianuuu.com/lib/logs"
 	"qianuuu.com/player"
 )

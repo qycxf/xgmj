@@ -8,7 +8,7 @@ import (
 	"strings"
 
 	"qianuuu.com/lib/logs"
-	"qianuuu.com/ahmj/internal/mjcomn"
+	"qianuuu.com/xgmj/internal/mjcomn"
 )
 
 type JsonStruct struct {

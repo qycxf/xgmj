@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"runtime"
 
-	"qianuuu.com/ahmj/internal/config"
+	"qianuuu.com/xgmj/internal/config"
 	"qianuuu.com/lib/logs"
 	"qianuuu.com/lib/util"
 	"qianuuu.com/player"

@@ -3,10 +3,10 @@ package game
 import (
 	"testing"
 
-	"qianuuu.com/ahmj/internal/config"
-	"qianuuu.com/ahmj/internal/consts"
-	"qianuuu.com/ahmj/internal/game/maj"
-	"qianuuu.com/ahmj/internal/game/table"
+	"qianuuu.com/xgmj/internal/config"
+	"qianuuu.com/xgmj/internal/consts"
+	"qianuuu.com/xgmj/internal/game/maj"
+	"qianuuu.com/xgmj/internal/game/table"
 	. "qianuuu.com/mahjong/mjcomn"
 )
 

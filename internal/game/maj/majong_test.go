@@ -3,7 +3,7 @@ package maj
 import (
 	"testing"
 
-	"qianuuu.com/ahmj/internal/config"
+	"qianuuu.com/xgmj/internal/config"
 )
 
 func TestMajong(t *testing.T) {

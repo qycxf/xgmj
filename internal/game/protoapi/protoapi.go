@@ -8,8 +8,8 @@
 package protoapi
 
 import (
-	"qianuuu.com/ahmj/internal/config"
-	"qianuuu.com/ahmj/internal/protobuf"
+	"qianuuu.com/xgmj/internal/config"
+	"qianuuu.com/xgmj/internal/protobuf"
 	"qianuuu.com/lib/values"
 	"qianuuu.com/player"
 )

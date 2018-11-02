@@ -5,7 +5,7 @@ package table
 import (
 	"strconv"
 
-	"qianuuu.com/ahmj/internal/consts"
+	"qianuuu.com/xgmj/internal/consts"
 	"qianuuu.com/lib/util"
 )
 

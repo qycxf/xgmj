@@ -1,8 +1,8 @@
 package table
 
 import (
-	"qianuuu.com/ahmj/internal/game/seat"
-	. "qianuuu.com/ahmj/internal/mjcomn"
+	"qianuuu.com/xgmj/internal/game/seat"
+	. "qianuuu.com/xgmj/internal/mjcomn"
 	"qianuuu.com/player"
 )
 

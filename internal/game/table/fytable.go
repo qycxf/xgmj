@@ -3,11 +3,11 @@ package table
 import (
 	"strconv"
 
-	"qianuuu.com/ahmj/internal/config"
-	"qianuuu.com/ahmj/internal/consts"
-	"qianuuu.com/ahmj/internal/game/seat"
+	"qianuuu.com/xgmj/internal/config"
+	"qianuuu.com/xgmj/internal/consts"
+	"qianuuu.com/xgmj/internal/game/seat"
 	"qianuuu.com/lib/logs"
-	. "qianuuu.com/ahmj/internal/mjcomn"
+	. "qianuuu.com/xgmj/internal/mjcomn"
 )
 
 // [阜阳麻将] 牌桌

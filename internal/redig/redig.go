@@ -10,7 +10,7 @@ package redig
 
 import (
 	"golang.org/x/protobuf/proto"
-	"qianuuu.com/ahmj/internal/protobuf"
+	"qianuuu.com/xgmj/internal/protobuf"
 	"qianuuu.com/hall/lib/redic"
 	"qianuuu.com/lib/logs"
 	"qianuuu.com/lib/util"

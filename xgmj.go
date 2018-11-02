@@ -17,8 +17,8 @@ import (
 	_ "net/http/pprof"
 
 	_ "github.com/lib/pq"
-	"qianuuu.com/ahmj/internal/config"
-	"qianuuu.com/ahmj/internal/game"
+	"qianuuu.com/xgmj/internal/config"
+	"qianuuu.com/xgmj/internal/game"
 	"qianuuu.com/lib/logs"
 )
 

@@ -2,8 +2,8 @@ package protoapi
 
 import (
 	"golang.org/x/protobuf/proto"
-	"qianuuu.com/ahmj/internal/consts"
-	"qianuuu.com/ahmj/internal/protobuf"
+	"qianuuu.com/xgmj/internal/consts"
+	"qianuuu.com/xgmj/internal/protobuf"
 	"qianuuu.com/lib/logs"
 	"qianuuu.com/player"
 )

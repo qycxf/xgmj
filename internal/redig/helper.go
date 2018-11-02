@@ -8,8 +8,8 @@ package redig
 import (
 	"fmt"
 
-	"qianuuu.com/ahmj/internal/config"
-	"qianuuu.com/ahmj/internal/protobuf"
+	"qianuuu.com/xgmj/internal/config"
+	"qianuuu.com/xgmj/internal/protobuf"
 
 	"golang.org/x/protobuf/proto"
 )

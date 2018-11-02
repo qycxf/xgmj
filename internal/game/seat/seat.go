@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"qianuuu.com/ahmj/internal/consts"
+	"qianuuu.com/xgmj/internal/consts"
 	"qianuuu.com/lib/logs"
 	"qianuuu.com/player"
 )

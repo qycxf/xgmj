@@ -6,9 +6,9 @@ import (
 
 	"strconv"
 
-	"qianuuu.com/ahmj/internal/config"
-	"qianuuu.com/ahmj/internal/consts"
-	. "qianuuu.com/ahmj/internal/mjcomn"
+	"qianuuu.com/xgmj/internal/config"
+	"qianuuu.com/xgmj/internal/consts"
+	. "qianuuu.com/xgmj/internal/mjcomn"
 	"qianuuu.com/lib/logs"
 )
 

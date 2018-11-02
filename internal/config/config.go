@@ -10,11 +10,11 @@ import (
 	"io/ioutil"
 	"os"
 
-	"qianuuu.com/ahmj/internal/mjcomn"
+	"qianuuu.com/xgmj/internal/mjcomn"
 	"qianuuu.com/lib/logs"
 
 	"github.com/BurntSushi/toml"
-	"qianuuu.com/ahmj/internal/consts"
+	"qianuuu.com/xgmj/internal/consts"
 )
 
 // Config 配置类型

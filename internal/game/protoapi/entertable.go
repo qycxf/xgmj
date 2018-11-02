@@ -2,10 +2,10 @@ package protoapi
 
 import (
 	"golang.org/x/protobuf/proto"
-	"qianuuu.com/ahmj/internal/config"
-	"qianuuu.com/ahmj/internal/consts"
-	"qianuuu.com/ahmj/internal/game/table"
-	"qianuuu.com/ahmj/internal/protobuf"
+	"qianuuu.com/xgmj/internal/config"
+	"qianuuu.com/xgmj/internal/consts"
+	"qianuuu.com/xgmj/internal/game/table"
+	"qianuuu.com/xgmj/internal/protobuf"
 	"qianuuu.com/lib/logs"
 	"qianuuu.com/player"
 )

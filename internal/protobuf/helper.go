@@ -9,10 +9,10 @@ import (
 	"time"
 
 	"golang.org/x/protobuf/proto"
-	"qianuuu.com/ahmj/internal/consts"
-	"qianuuu.com/ahmj/internal/game/seat"
-	"qianuuu.com/ahmj/internal/game/table"
-	"qianuuu.com/ahmj/internal/mjcomn"
+	"qianuuu.com/xgmj/internal/consts"
+	"qianuuu.com/xgmj/internal/game/seat"
+	"qianuuu.com/xgmj/internal/game/table"
+	"qianuuu.com/xgmj/internal/mjcomn"
 	"qianuuu.com/lib/logs"
 	"qianuuu.com/player"
 )

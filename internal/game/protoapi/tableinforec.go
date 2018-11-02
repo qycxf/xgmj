@@ -1,7 +1,7 @@
 package protoapi
 
 import (
-	"qianuuu.com/ahmj/internal/protobuf"
+	"qianuuu.com/xgmj/internal/protobuf"
 	"qianuuu.com/player"
 )
 
