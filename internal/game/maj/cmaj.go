@@ -1127,6 +1127,128 @@ func (cmaj *CMaj) Check_SIHUO() int {
 //	return true
 //}
 
+//获取胡牌的将牌
+func (cmaj *CMaj) GetJiangPai(_pxList [][]int) *MCard {
+
+	handPai := cmaj.GetHandPai()
+	//logs.Info("GetJiangPai--------------->handTing111:%v", handTing)
+	if len(handPai) == 2 {
+		return handPai[0]
+	}
+	//删去胡牌时AAA ABC 剩下的即是将
+	for _, v := range _pxList {
+		for _, n := range v {
+			handPai = cmaj.DeleteArrayCard(handPai, n)
+		}
+		logs.Info("tableId:%v,~~~~~~~~~~~~~~~ GetJiangPai handPai:%v", cmaj.TableCfg.TableId, handPai)
+
+	}
+	logs.Info("tableId:%v, GetJiangPai handPai:%v", cmaj.TableCfg.TableId, handPai)
+
+	if len(handPai) != 2 {
+		logs.Info("tableId:%v,*******************************error!!  GetJiangPai handPai:%v _pxList:%v",
+			cmaj.TableCfg.TableId, handPai, _pxList)
+		return nil
+	}
+	return handPai[0]
+}
+
+//删除牌数组中的 值为_data的所有牌,返回新数组
+func (cmaj *CMaj) DeleteArrayCard(arr []*MCard, _data int) []*MCard {
+
+	tmp := make([]*MCard, 0)
+	hasDel := false
+	for _, v := range arr {
+		if !hasDel && v.GetData() == _data { //一次删除一个
+
+			hasDel = true
+		} else {
+			tmp = append(tmp, v)
+		}
+	}
+
+	return tmp
+}
+
+//四暗刻检测
+func (cmaj *CMaj) Check_SAK() bool {
+	// todo  没做完整
+
+	anKeCt := 0
+
+	anKeCt = cmaj.AnGangCt
+
+	if anKeCt == 4 {
+
+		return true
+	}
+	return false
+}
+
+//字一色检测检测
+func (cmaj *CMaj) Check_ZYS() bool {
+
+	//牌中全是字牌
+	allcards := cmaj.GetAllPai()
+
+	for _, v := range allcards {
+		if v.GetColor() < 3 {
+			return false
+		}
+	}
+	return true
+}
+
+//小四喜检测
+func (cmaj *CMaj) Check_XSX(_calHuInfo *CalHuInfo) bool {
+
+	// 有三幅风刻子，（包括杠、碰）并且风牌做将，
+	dongCt := 0
+	nanCt := 0
+	xiCt := 0
+	beiCt := 0
+	card_Dong := NewMCard(108)
+	card_Nan := NewMCard(112)
+	card_Xi := NewMCard(116)
+	card_Bei := NewMCard(120)
+
+	jiang := cmaj.GetJiangPai(_calHuInfo.PxList)
+
+	allCards := cmaj.GetAllPai()
+
+	for _, v := range allCards {
+		if v.Equal(card_Dong) {
+			dongCt++
+		}
+		if v.Equal(card_Nan) {
+			nanCt++
+		}
+		if v.Equal(card_Xi) {
+			xiCt++
+		}
+		if v.Equal(card_Bei) {
+			beiCt++
+		}
+	}
+	fengKeCt := 0
+	if dongCt >= 3 {
+		fengKeCt++
+	}
+	if nanCt >= 3 {
+		fengKeCt++
+	}
+	if xiCt >= 3 {
+		fengKeCt++
+	}
+	if beiCt >= 3 {
+		fengKeCt++
+	}
+	if fengKeCt == 3 && jiang != nil && jiang.GetColor() == Color_Feng {
+		return true
+	}
+	return false
+}
+
 //混一色检测
 func (cmaj *CMaj) Check_HYS() bool {
 	xuCt := 0
