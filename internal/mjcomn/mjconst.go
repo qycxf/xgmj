@@ -7,11 +7,10 @@ const (
 	DefaultIndex int = 999 //默认下标值,用该值替代-1
 )
 
-
 // 牌桌分类
 const (
-	TableClass_FangKa     = 1  // 房卡
-	TableClass_Coin       = 2  // 金币
+	TableClass_FangKa = 1 // 房卡
+	TableClass_Coin   = 2 // 金币
 )
 
 //返回牌桌分类名称
@@ -72,7 +71,8 @@ const (
 	PXTYPE_UNKNOW = 0 //未知
 	PXTYPE_PINGHU = 1 //平胡
 	PXTYPE_7DUI   = 2 //七对
-	PXTYPE_TIANHU   = 3 //天胡
+	PXTYPE_SSY    = 3 //十三幺胡牌
+	PXTYPE_TIANHU = 3 //天胡
 )
 
 //返回胡牌类型名称

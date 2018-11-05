@@ -3,7 +3,8 @@ package maj
 import (
 	"testing"
 
-	"qianuuu.com/xgmj/internal/config"
+	"fmt"
+	"qianuuu.com/xgmj/internal/mjcomn"
 )
 
 func TestMajong(t *testing.T) {
@@ -17,17 +18,17 @@ func TestMajong(t *testing.T) {
 	// 条	72, 73, 74, 75,   76, 77, 78, 79,   80, 81, 82, 83,    84, 85, 86, 87,    88, 89, 90, 91,    92, 93, 94, 95,    96, 97, 98, 99,    100, 101, 102, 103,  104, 105, 106, 107, //条 72 - 107
 	//}
 
-	_tableCfg := config.NewTableCfg()
-	_tableCfg.TableType = TableType_HZMJ_AH
-	cmaj := NewCMaj(0, _tableCfg)
-	//cmaj.GetPeiPaiArr(3)
-
-	//{"中", "中", "中", "3万", "4万", "4筒", "6筒", "7筒", "7筒", "1条", "2条", "4条", "5条", "8条", "9条"},
-	arr := []int{124, 125, 126, 8, 12, 48, 56, 60, 61, 72, 76, 84, 88, 100}
-	for _, v := range arr {
-		card := NewMCard(v)
-		cmaj.AddHandPai(card, true)
-	}
+	//_tableCfg := config.NewTableCfg()
+	//_tableCfg.TableType = TableType_HZMJ_AH
+	//cmaj := NewCMaj(0, _tableCfg)
+	////cmaj.GetPeiPaiArr(3)
+	//
+	////{"中", "中", "中", "3万", "4万", "4筒", "6筒", "7筒", "7筒", "1条", "2条", "4条", "5条", "8条", "9条"},
+	//arr := []int{124, 125, 126, 8, 12, 48, 56, 60, 61, 72, 76, 84, 88, 100}
+	//for _, v := range arr {
+	//	card := NewMCard(v)
+	//	cmaj.AddHandPai(card, true)
+	//}
 
 	//cmaj.DoPeng(NewCard(84))
 	//cmaj.DoPeng(NewCard(76))
@@ -36,5 +37,7 @@ func TestMajong(t *testing.T) {
 
 	//isHu := cmaj.Check_PingHU()
 	//logs.Info("isHu:%v", isHu)
+
+	fmt.Println(mjcomn.GetVal(114))
 
 }

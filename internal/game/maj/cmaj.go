@@ -1170,16 +1170,41 @@ func (cmaj *CMaj) DeleteArrayCard(arr []*MCard, _data int) []*MCard {
 	return tmp
 }
 
+//检测 清一色（2番）：全是一种花色的平胡
+func (cmaj *CMaj) Check_QYS() bool {
+	//牌全是一种花色，全字牌不计清一色
+
+	allMCardArr := cmaj.GetAllPai()
+	color := allMCardArr[0].GetColor()
+	if color > Color_Tiao {
+		return false
+	}
+
+	for _, v := range allMCardArr {
+		if v.GetColor() != color {
+			return false
+		}
+	}
+	return true
+}
+
 //四暗刻检测
 func (cmaj *CMaj) Check_SAK() bool {
-	// todo  没做完整
-
+	//四个暗刻（杠），必须在手上，
+	handCards := cmaj.GetHandPai()
 	anKeCt := 0
-
-	anKeCt = cmaj.AnGangCt
-
+	for _, v := range handCards {
+		cardCount := 0
+		for _, k := range handCards {
+			if v.Equal(k) {
+				cardCount++
+			}
+		}
+		if cardCount >= 3 {
+			anKeCt++
+		}
+	}
 	if anKeCt == 4 {
-
 		return true
 	}
 	return false
@@ -1540,18 +1565,6 @@ func (cmaj *CMaj) Check_ZZ() bool {
 		}
 	}
 
-	return true
-}
-
-//检测 清一色（2番）：全是一种花色的平胡
-func (cmaj *CMaj) Check_QYS() bool {
-	allMCardArr := cmaj.GetAllPai()
-	color := allMCardArr[0].GetColor()
-	for _, v := range allMCardArr {
-		if v.GetColor() != color {
-			return false
-		}
-	}
 	return true
 }
 

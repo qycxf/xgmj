@@ -108,6 +108,11 @@ func (ch *CalHuInfo) ChkHu() bool {
 		}
 	}
 
+	if ch.Check_SSY() {
+		ch.PxType = PXTYPE_SSY
+		return true
+	}
+
 	isPingHu := ch.Check_PingHU()
 	if isPingHu {
 		ch.PxType = PXTYPE_PINGHU
@@ -269,6 +274,88 @@ func (ch *CalHuInfo) Check_7DUI() bool {
 
 	// logs.Info("七对胡牌---------------_handIntArr:>%v", _handIntArr)
 	return true
+}
+
+//检测十三幺胡牌
+func (ch *CalHuInfo) Check_SSY() bool {
+
+	handCt := len(ch.WanIntArr) + len(ch.TongIntArr) + len(ch.TiaoIntArr) + len(ch.FengIntArr) + len(ch.ZfbIntArr)
+	if handCt != 14 {
+		return false
+	}
+	oneCount_wan := 0
+	nineCount_wan := 0
+	for _, v := range ch.WanIntArr {
+		if GetVal(v) == 1 {
+			oneCount_wan++
+		}
+		if GetVal(v) == 9 {
+			nineCount_wan++
+		}
+	}
+
+	oneCount_tong := 0
+	nineCount_tong := 0
+	for _, v := range ch.TongIntArr {
+		if GetVal(v) == 1 {
+			oneCount_tong++
+		}
+		if GetVal(v) == 9 {
+			nineCount_tong++
+		}
+	}
+	oneCount_tiao := 0
+	nineCount_tiao := 0
+	for _, v := range ch.TiaoIntArr {
+		if GetVal(v) == 1 {
+			oneCount_tiao++
+		}
+		if GetVal(v) == 9 {
+			nineCount_tiao++
+		}
+	}
+
+	dongCt := 0
+	nanCt := 0
+	xiCt := 0
+	beiCt := 0
+	for _, v := range ch.FengIntArr {
+		if GetVal(v) == 1 {
+			dongCt++
+		}
+		if GetVal(v) == 2 {
+			nanCt++
+		}
+		if GetVal(v) == 3 {
+			xiCt++
+		}
+		if GetVal(v) == 4 {
+			beiCt++
+		}
+	}
+	zhongCt := 0
+	faCt := 0
+	baiCt := 0
+	for _, v := range ch.ZfbIntArr {
+		if GetVal(v) == 1 {
+			zhongCt++
+		}
+		if GetVal(v) == 2 {
+			faCt++
+		}
+		if GetVal(v) == 3 {
+			baiCt++
+		}
+	}
+
+	if oneCount_wan >= 1 && nineCount_wan >= 1 &&
+		oneCount_tong >= 1 && nineCount_tong >= 1 &&
+		oneCount_tiao >= 1 && nineCount_tiao >= 1 &&
+		dongCt >= 1 && nanCt >= 1 && xiCt >= 1 && beiCt >= 1 &&
+		zhongCt >= 1 && faCt >= 1 && baiCt >= 1 {
+		return true
+	}
+	return false
 }
 
 //检测牌型 [豪华七对]：牌型为七对，但玩家手中有四张一样的牌（没有杠出）
