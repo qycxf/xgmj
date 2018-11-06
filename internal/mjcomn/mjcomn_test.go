@@ -51,11 +51,11 @@ func TestMajong(t *testing.T) {
 	//}
 
 	ch := &CalHuInfo{
-		WanIntArr:  []int{1, 12, 32},
-		TongIntArr: []int{38, 38, 71},
-		TiaoIntArr: []int{72, 91, 107},
+		WanIntArr:  []int{1, 12},
+		TongIntArr: []int{45, 58, 71},
+		TiaoIntArr: []int{76, 91, 103},
 		ZfbIntArr:  []int{108, 112, 118},
-		FengIntArr: []int{135, 128},
+		FengIntArr: []int{125, 135, 128},
 	}
 
 	handCards := make([]int, 0)

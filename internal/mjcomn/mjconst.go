@@ -72,7 +72,7 @@ const (
 	PXTYPE_PINGHU = 1 //平胡
 	PXTYPE_7DUI   = 2 //七对
 	PXTYPE_SSY    = 3 //十三幺胡牌
-	PXTYPE_SSL    = 4 //十三烂胡牌
+	PXTYPE_SSL    = 4 //十三不搭
 	PXTYPE_TIANHU = 3 //天胡
 )
 

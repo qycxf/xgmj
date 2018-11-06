@@ -362,46 +362,31 @@ func (ch *CalHuInfo) Check_SSY() bool {
 	return false
 }
 
-//十三烂检测
+//十三不搭（七星不靠）
 func (ch *CalHuInfo) Check_ShiSanLan() bool {
 	//ch.SortHand()
-	//万筒条
-	_handIntArr := [][]int{ch.WanIntArr, ch.TongIntArr, ch.TiaoIntArr}
+
 	//手牌总长度
 	size := len(ch.WanIntArr) + len(ch.TongIntArr) + len(ch.TiaoIntArr) + len(ch.FengIntArr) + len(ch.ZfbIntArr)
 	if size != 14 {
 		return false
 	}
-	equleCount := 0
-	//间隔小于2return false
-	for i := 0; i < len(_handIntArr); i++ {
-		if len(_handIntArr) > 1 {
-			for k := 0; k < len(_handIntArr[i])-1; k++ {
-				if GetVal(_handIntArr[i][k+1]) == GetVal(_handIntArr[i][k]) {
-					equleCount++
-					if equleCount > 1 {
-						return false
-					} else {
-						continue
-					}
-				}
 
-				if NewMCard(_handIntArr[i][k+1]).value-NewMCard(_handIntArr[i][k]).value < 3 {
-					return false
-				}
-			}
-		}
+	wan := SortIntArrAsc(ch.WanIntArr)
+	tong := SortIntArrAsc(ch.TongIntArr)
+	tiao := SortIntArrAsc(ch.TiaoIntArr)
 
+	wanArr, tongArr, tiaoArr := CheckQIBuKao(wan, tong, tiao)
+	if len(ch.FengIntArr)+len(ch.ZfbIntArr) == 7 {
+
+	} else {
+		return false
 	}
+
 	if len(ch.FengIntArr) > 1 {
 		for i := 0; i < len(ch.FengIntArr)-1; i++ {
 			if NewMCard(ch.FengIntArr[i]).Equal(NewMCard(ch.FengIntArr[i+1])) {
-				equleCount++
-				if equleCount > 1 {
-					return false
-				} else {
-					continue
-				}
+				return false
 			}
 		}
 	}
@@ -409,19 +394,231 @@ func (ch *CalHuInfo) Check_ShiSanLan() bool {
 	if len(ch.ZfbIntArr) > 1 {
 		for i := 0; i < len(ch.ZfbIntArr)-1; i++ {
 			if NewMCard(ch.ZfbIntArr[i]).Equal(NewMCard(ch.ZfbIntArr[i+1])) {
-				equleCount++
-				if equleCount > 1 {
-					return false
-				} else {
-					continue
-				}
+				return false
 			}
 		}
 	}
-	if equleCount == 1 {
-		return true
+
+	if wanArr > 0 && tongArr > 0 && tiaoArr > 0 {
+
+		if wanArr == 1 && tongArr == 2 && tiaoArr == 3 {
+			return true
+
+		} else if wanArr == 1 && tongArr == 3 && tiaoArr == 2 {
+			return true
+		} else if wanArr == 2 && tongArr == 1 && tiaoArr == 3 {
+			return true
+		} else if wanArr == 2 && tongArr == 3 && tiaoArr == 1 {
+			return true
+		} else if wanArr == 3 && tongArr == 1 && tiaoArr == 2 {
+			return true
+		} else if wanArr == 3 && tongArr == 2 && tiaoArr == 1 {
+			return true
+		} else {
+			return false
+		}
 	}
+
 	return false
+}
+
+func CheckQIBuKao(wan []int, tong []int, tiao []int) (int, int, int) {
+
+	wanArr := 0
+	tongArr := 0
+	tiaoArr := 0
+	if len(wan) == 3 {
+		if GetVal(wan[0]) == 1 {
+			if GetVal(wan[1]) == 4 {
+				if GetVal(wan[2]) == 7 {
+					wanArr = 1
+				} else {
+					return 0, 0, 0
+				}
+
+			} else {
+				return 0, 0, 0
+			}
+
+		} else if GetVal(wan[0]) == 2 {
+			if GetVal(wan[1]) == 5 {
+				if GetVal(wan[2]) == 8 {
+					wanArr = 2
+				} else {
+					return 0, 0, 0
+				}
+			} else {
+				return 0, 0, 0
+			}
+		} else if GetVal(wan[0]) == 3 {
+			if GetVal(wan[1]) == 6 {
+				if GetVal(wan[2]) == 9 {
+					wanArr = 3
+				} else {
+					return 0, 0, 0
+				}
+			} else {
+				return 0, 0, 0
+			}
+		} else {
+			return 0, 0, 0
+		}
+
+	} else if len(wan) == 2 {
+		if GetVal(wan[0]) == 1 {
+			if GetVal(wan[1]) == 4 || GetVal(wan[1]) == 7 {
+				wanArr = 1
+			} else {
+				return 0, 0, 0
+			}
+
+		} else if GetVal(wan[0]) == 2 {
+			if GetVal(wan[1]) == 5 || GetVal(wan[1]) == 8 {
+				wanArr = 2
+			} else {
+				return 0, 0, 0
+			}
+		} else if GetVal(wan[0]) == 3 {
+			if GetVal(wan[1]) == 6 || GetVal(wan[1]) == 9 {
+				wanArr = 3
+			} else {
+				return 0, 0, 0
+			}
+		} else {
+			return 0, 0, 0
+		}
+	} else {
+		return 0, 0, 0
+	}
+
+	if len(tong) == 3 {
+		if GetVal(tong[0]) == 1 {
+			if GetVal(tong[1]) == 4 {
+				if GetVal(tong[2]) == 7 {
+					tongArr = 1
+				} else {
+					return 0, 0, 0
+				}
+
+			} else {
+				return 0, 0, 0
+			}
+
+		} else if GetVal(tong[0]) == 2 {
+			if GetVal(tong[1]) == 5 {
+				if GetVal(tong[2]) == 8 {
+					tongArr = 2
+				} else {
+					return 0, 0, 0
+				}
+			} else {
+				return 0, 0, 0
+			}
+		} else if GetVal(tong[0]) == 3 {
+			if GetVal(tong[1]) == 6 {
+				if GetVal(tong[2]) == 9 {
+					tongArr = 3
+				} else {
+					return 0, 0, 0
+				}
+			} else {
+				return 0, 0, 0
+			}
+		} else {
+			return 0, 0, 0
+		}
+
+	} else if len(tong) == 2 {
+		if GetVal(tong[0]) == 1 {
+			if GetVal(tong[1]) == 4 || GetVal(tong[1]) == 7 {
+				tongArr = 1
+			} else {
+				return 0, 0, 0
+			}
+
+		} else if GetVal(tong[0]) == 2 {
+			if GetVal(tong[1]) == 5 || GetVal(tong[1]) == 8 {
+				tongArr = 2
+			} else {
+				return 0, 0, 0
+			}
+		} else if GetVal(tong[0]) == 3 {
+			if GetVal(tong[1]) == 6 || GetVal(tong[1]) == 9 {
+				tongArr = 3
+			} else {
+				return 0, 0, 0
+			}
+		} else {
+			return 0, 0, 0
+		}
+	} else {
+		return 0, 0, 0
+	}
+
+	if len(tiao) == 3 {
+		if GetVal(tiao[0]) == 1 {
+			if GetVal(tiao[1]) == 4 {
+				if GetVal(tiao[2]) == 7 {
+					tiaoArr = 1
+				} else {
+					return 0, 0, 0
+				}
+
+			} else {
+				return 0, 0, 0
+			}
+
+		} else if GetVal(tiao[0]) == 2 {
+			if GetVal(tiao[1]) == 5 {
+				if GetVal(tiao[2]) == 8 {
+					tiaoArr = 2
+				} else {
+					return 0, 0, 0
+				}
+			} else {
+				return 0, 0, 0
+			}
+		} else if GetVal(tiao[0]) == 3 {
+			if GetVal(tiao[1]) == 6 {
+				if GetVal(tiao[2]) == 9 {
+					tiaoArr = 3
+				} else {
+					return 0, 0, 0
+				}
+			} else {
+				return 0, 0, 0
+			}
+		} else {
+			return 0, 0, 0
+		}
+
+	} else if len(tiao) == 2 {
+		if GetVal(tiao[0]) == 1 {
+			if GetVal(tiao[1]) == 4 || GetVal(tiao[1]) == 7 {
+				tiaoArr = 1
+			} else {
+				return 0, 0, 0
+			}
+
+		} else if GetVal(tiao[0]) == 2 {
+			if GetVal(tiao[1]) == 5 || GetVal(tiao[1]) == 8 {
+				tiaoArr = 2
+			} else {
+				return 0, 0, 0
+			}
+		} else if GetVal(tiao[0]) == 3 {
+			if GetVal(tiao[1]) == 6 || GetVal(tiao[1]) == 9 {
+				tiaoArr = 3
+			} else {
+				return 0, 0, 0
+			}
+		} else {
+			return 0, 0, 0
+		}
+	} else {
+		return 0, 0, 0
+	}
+	return wanArr, tongArr, tiaoArr
 }
 
 //检测牌型 [豪华七对]：牌型为七对，但玩家手中有四张一样的牌（没有杠出）
