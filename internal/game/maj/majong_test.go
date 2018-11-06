@@ -38,6 +38,9 @@ func TestMajong(t *testing.T) {
 	//isHu := cmaj.Check_PingHU()
 	//logs.Info("isHu:%v", isHu)
 
+	cmaj := &CMaj{}
+
+	cmaj.HandPaiArr = [][]*mjcomn.MCard{}
 	fmt.Println(mjcomn.GetVal(114))
 
 }

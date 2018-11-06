@@ -1150,6 +1150,9 @@ func (cmaj *CMaj) GetJiangPai(_pxList [][]int) *MCard {
 			cmaj.TableCfg.TableId, handPai, _pxList)
 		return nil
 	}
+	if len(handPai) == 0 {
+		return nil
+	}
 	return handPai[0]
 }
 
@@ -1168,6 +1171,84 @@ func (cmaj *CMaj) DeleteArrayCard(arr []*MCard, _data int) []*MCard {
 	}
 
 	return tmp
+}
+
+//全带幺检测
+func (cmaj *CMaj) Check_QDY(calHuInfo *CalHuInfo) bool {
+	jiang := cmaj.GetJiangPai(calHuInfo.PxList)
+	if jiang == nil {
+		return false
+	}
+
+	if jiang.GetColor() > Color_Tiao {
+		return false
+	}
+	if jiang.GetValue() != 1 && jiang.GetValue() != 9 {
+		return false
+	}
+
+	for _, v := range calHuInfo.PxList {
+		if len(v) == 3 {
+			if NewMCard(v[0]).GetColor() > Color_Tiao {
+				return false
+			}
+			if NewMCard(v[0]).GetValue() == 1 || NewMCard(v[2]).GetValue() == 9 {
+				continue
+			} else {
+				return false
+			}
+		} else {
+			return false
+		}
+	}
+	return true
+}
+
+//三杠
+func (cmaj *CMaj) Check_SG() bool {
+	if cmaj.GetGangCt()/4 == 3 {
+		return true
+	}
+	return false
+}
+
+//清龙检测
+func (cmaj *CMaj) Check_QL() bool {
+	MostCards := cmaj.HandPaiArr[cmaj.MostColor()]
+	for i := 1; i < 10; i++ {
+		isHas := false
+		for _, v := range MostCards {
+			if v.GetValue() == i {
+				isHas = true
+			}
+		}
+
+		if isHas {
+
+		} else {
+			return false
+		}
+	}
+	return true
+}
+
+//混幺九检测
+func (cmaj *CMaj) Check_HYJ(calHuInfo *CalHuInfo) bool {
+
+	//由字牌和序数牌一、九的刻子、将牌组成的糊牌。不计对对糊。
+	if !cmaj.Check_DDHu(calHuInfo) {
+		return false
+	}
+
+	allCards := cmaj.GetAllPai()
+	for _, v := range allCards {
+		if v.GetColor() < Color_Feng {
+			if v.GetValue() != 1 && v.GetValue() != 9 {
+				return false
+			}
+		}
+	}
+	return true
 }
 
 //检测 清一色（2番）：全是一种花色的平胡
