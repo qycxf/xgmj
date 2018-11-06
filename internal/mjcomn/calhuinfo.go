@@ -113,6 +113,10 @@ func (ch *CalHuInfo) ChkHu() bool {
 		return true
 	}
 
+	if ch.Check_ShiSanLan() {
+		ch.PxType = PXTYPE_SSL
+		return true
+	}
 	isPingHu := ch.Check_PingHU()
 	if isPingHu {
 		ch.PxType = PXTYPE_PINGHU
@@ -353,6 +357,68 @@ func (ch *CalHuInfo) Check_SSY() bool {
 		oneCount_tiao >= 1 && nineCount_tiao >= 1 &&
 		dongCt >= 1 && nanCt >= 1 && xiCt >= 1 && beiCt >= 1 &&
 		zhongCt >= 1 && faCt >= 1 && baiCt >= 1 {
+		return true
+	}
+	return false
+}
+
+//十三烂检测
+func (ch *CalHuInfo) Check_ShiSanLan() bool {
+	//ch.SortHand()
+	//万筒条
+	_handIntArr := [][]int{ch.WanIntArr, ch.TongIntArr, ch.TiaoIntArr}
+	//手牌总长度
+	size := len(ch.WanIntArr) + len(ch.TongIntArr) + len(ch.TiaoIntArr) + len(ch.FengIntArr) + len(ch.ZfbIntArr)
+	if size != 14 {
+		return false
+	}
+	equleCount := 0
+	//间隔小于2return false
+	for i := 0; i < len(_handIntArr); i++ {
+		if len(_handIntArr) > 1 {
+			for k := 0; k < len(_handIntArr[i])-1; k++ {
+				if GetVal(_handIntArr[i][k+1]) == GetVal(_handIntArr[i][k]) {
+					equleCount++
+					if equleCount > 1 {
+						return false
+					} else {
+						continue
+					}
+				}
+
+				if NewMCard(_handIntArr[i][k+1]).value-NewMCard(_handIntArr[i][k]).value < 3 {
+					return false
+				}
+			}
+		}
+
+	}
+	if len(ch.FengIntArr) > 1 {
+		for i := 0; i < len(ch.FengIntArr)-1; i++ {
+			if NewMCard(ch.FengIntArr[i]).Equal(NewMCard(ch.FengIntArr[i+1])) {
+				equleCount++
+				if equleCount > 1 {
+					return false
+				} else {
+					continue
+				}
+			}
+		}
+	}
+
+	if len(ch.ZfbIntArr) > 1 {
+		for i := 0; i < len(ch.ZfbIntArr)-1; i++ {
+			if NewMCard(ch.ZfbIntArr[i]).Equal(NewMCard(ch.ZfbIntArr[i+1])) {
+				equleCount++
+				if equleCount > 1 {
+					return false
+				} else {
+					continue
+				}
+			}
+		}
+	}
+	if equleCount == 1 {
 		return true
 	}
 	return false

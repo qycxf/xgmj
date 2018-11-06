@@ -1,6 +1,9 @@
 package mjcomn
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestMajong(t *testing.T) {
 
@@ -47,4 +50,24 @@ func TestMajong(t *testing.T) {
 	//	logs.Info("------------------SendCheckTing()-------------->打出%v可胡:%v", sendCard, huCard)
 	//}
 
+	ch := &CalHuInfo{
+		WanIntArr:  []int{1, 12, 32},
+		TongIntArr: []int{38, 38, 71},
+		TiaoIntArr: []int{72, 91, 107},
+		ZfbIntArr:  []int{108, 112, 118},
+		FengIntArr: []int{135, 128},
+	}
+
+	handCards := make([]int, 0)
+	handCards = append(handCards, ch.WanIntArr...)
+	handCards = append(handCards, ch.TongIntArr...)
+	handCards = append(handCards, ch.TiaoIntArr...)
+	handCards = append(handCards, ch.ZfbIntArr...)
+	handCards = append(handCards, ch.FengIntArr...)
+
+	for _, v := range handCards {
+		fmt.Print(NewMCard(v), ",")
+	}
+	fmt.Println()
+	fmt.Println(ch.Check_ShiSanLan())
 }
