@@ -1,11 +1,11 @@
 package table
 
 import (
+	"qianuuu.com/lib/logs"
 	"qianuuu.com/xgmj/internal/config"
 	"qianuuu.com/xgmj/internal/consts"
 	"qianuuu.com/xgmj/internal/game/seat"
 	. "qianuuu.com/xgmj/internal/mjcomn"
-	"qianuuu.com/lib/logs"
 )
 
 // [蚌埠麻将] 牌桌
@@ -137,6 +137,14 @@ func (t *BBTable) calHuResult(_seat *seat.Seat) {
 		}
 
 		huCmaj.JiePaoCt++ //接炮次数
+
+		if len(huCmaj.GetHandPai()) == 2 && huCmaj.AnGangCt == 0 {
+			huCmaj.AddPxId(consts.PXID_XGMJ_QQR)
+		}
+
+		if huCmaj.Check_MQ() {
+			huCmaj.AddPxId(consts.PXID_XGMJ_MENQING)
+		}
 
 	} else if huType == HUTYPE_ZIMO { //自摸
 		for i := 0; i < t.TableCfg.PlayerCt; i++ {
@@ -641,6 +649,11 @@ func (t *BBTable) Check_PxId(_seatId int, _calHuInfo *CalHuInfo) bool {
 		logs.Info("tableId:%v--------Check_PxId---------->对对胡", t.TableCfg.TableId)
 	}
 
+	if t.Majhong.HaiDi {
+		huCmaj.AddPxId(consts.PXID_XGMJ_HAIDIHU)
+		logs.Info("tableId:%v--------Check_PxId----------海底胡", t.TableCfg.TableId)
+	}
+
 	return false
 }
 
@@ -725,7 +738,7 @@ func (t *BBTable) Check_AnGang(_seatId int) bool {
 // 最后一个可胡玩家选择取消胡
 func (t *BBTable) LastHuThinkerCancer() {
 	logs.Info("tableId:%v-------------------> 最后一个可胡玩家选择取消胡牌")
-t.GameOver()
+	t.GameOver()
 	//检测抓鸟
 	//t.ChkZhuaNiao()
 }
@@ -1064,8 +1077,17 @@ func (t *BBTable) GameStart() {
 
 	logs.Info("------------->gameStart(%v %v)<------------- 游戏开始!", t.ID, t.Majhong.GameCt)
 
+	t.Majhong.QuanFeng = GetQuanFeng(t.Majhong.GameCt)
+
 	//确定庄家
 	t.tableInter.MakeDSeat()
+
+	for i := 0; i < len(t.Majhong.CMajArr); i++ {
+		t.Majhong.CMajArr[i].GameCt = t.Majhong.GameCt
+		t.Majhong.CMajArr[i].QuanFeng = t.Majhong.QuanFeng
+		t.Majhong.CMajArr[i].DseatId = t.Majhong.DSeatID
+		t.Majhong.CMajArr[i].QuanFeng = t.Majhong.GetMenFeng(i)
+	}
 
 	//确定完庄家后再 清除部分上一局用于下局判断庄家位置的的临时数据
 	t.Majhong.ClearLastTmpData()
@@ -1084,6 +1106,24 @@ func (t *BBTable) GameStart() {
 	//	logs.Info("tableId:%v ========================>玩家开始思考", t.ID)
 	//}
 
+}
+
+func GetQuanFeng(gameCount int) int {
+
+	ct := gameCount % 4
+	if ct == 0 {
+		return 4
+	}
+	if ct == 1 {
+		return 1
+	}
+	if ct == 2 {
+		return 2
+	}
+	if ct == 3 {
+		return 3
+	}
+	return 1
 }
 
 //检测单局游戏结束,牌墙中没有牌则结束游戏,这个方法只在自己拿完最后一张无思考或者有思考但放弃时调用

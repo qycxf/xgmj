@@ -10,14 +10,14 @@ import (
 	"fmt"
 	"runtime"
 
+	"qianuuu.com/lib/logs"
+	"qianuuu.com/lib/qo"
+	"qianuuu.com/player"
 	"qianuuu.com/xgmj/internal/config"
 	"qianuuu.com/xgmj/internal/consts"
 	"qianuuu.com/xgmj/internal/game/maj"
 	"qianuuu.com/xgmj/internal/game/seat"
 	. "qianuuu.com/xgmj/internal/mjcomn"
-	"qianuuu.com/lib/logs"
-	"qianuuu.com/lib/qo"
-	"qianuuu.com/player"
 )
 
 // TimerAction 桌子操作
@@ -521,7 +521,7 @@ func (t *Table) SeatOpt(_seat *seat.Seat, _opt int, _data int, _isSave bool) {
 	//执行操作
 	switch _opt {
 
-	case OptTypeSend:            //出牌
+	case OptTypeSend: //出牌
 		t.autoChangeState.Stop() //出牌后立即停止计时器
 		t.send(_seat, _data)
 		break
@@ -938,7 +938,7 @@ func (t *Table) Buhua(_seatId int) {
 	_cmaj.LastFetchMCard = nil //  将LastFetchCard设置为空,防止发送tableinfo 时被移动,导致显示错误
 	t.Majhong.SetCurtSenderIndex(_seatId)
 
-	isSelfThink := t.tableInter.ThinkSelfPai(HUTYPE_DETAIL_GANG_SHANG_HUA, false)
+	isSelfThink := t.tableInter.ThinkSelfPai(1, false)
 	//需要思考
 	if isSelfThink {
 		t.setState(consts.TableStateWaiteThink)
@@ -1069,7 +1069,7 @@ func (t *Table) send(_seat *seat.Seat, _paiData int) {
 
 	//如果这是最后一张打出的牌,则这张牌为海底胡牌型
 	if t.Majhong.GetRemainPaiCt() == 0 {
-		//t.Majhong.LastSendCard.AddPx(consts.EXTPXID_HAI_DI_HU) //标记 海底胡
+		t.Majhong.HaiDi = true //标记 海底胡
 	}
 	if t.Majhong.CMajArr[seatID].GangShangPao {
 		//t.Majhong.LastSendCard.AddPx(consts.EXTPXID_GANG_PAO) //打出的牌 标记杠上炮

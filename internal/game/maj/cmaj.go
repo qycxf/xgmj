@@ -88,6 +88,10 @@ type CMaj struct {
 	MingGangCt int //总明杠次数
 	ChaDaJiao  int //总查大叫次数
 	ChaHuaZhu  int //总查花猪次数
+	QuanFeng   int //圈风
+	GameCt     int //局数
+	DseatId    int //庄家id
+	MenFeng    int //
 }
 
 //新建玩家牌管理对象
@@ -1173,6 +1177,404 @@ func (cmaj *CMaj) DeleteArrayCard(arr []*MCard, _data int) []*MCard {
 	return tmp
 }
 
+//断幺
+func (cmaj *CMaj) Check_DUANYAO() bool {
+
+	//糊牌中没有一、九和字牌。
+	allCards := cmaj.GetAllPai()
+	for _, v := range allCards {
+		if v.GetColor() > Color_Tiao {
+			return false
+		}
+		if v.GetValue() == 1 || v.GetValue() == 9 {
+			return false
+		}
+
+	}
+	return true
+}
+
+//门风刻
+func (cmaj *CMaj) Check_MFK() bool {
+
+	//与门风相同的风刻。
+	if cmaj.SeatID == cmaj.DseatId {
+		return false //此时只检测圈风刻
+	}
+	allCards := cmaj.GetAllPai()
+	for _, v := range allCards {
+		if v.GetColor() != Color_Feng {
+			continue
+		}
+		if v.GetValue() != cmaj.MenFeng {
+			continue
+		}
+		count := 0
+		for _, k := range allCards {
+			if v.Equal(k) {
+				count++
+			}
+		}
+		if count >= 3 {
+			return true
+		}
+	}
+	return false
+}
+
+//圈风刻
+func (cmaj *CMaj) Check_QFK() bool {
+
+	//与圈风相同的风刻。
+
+	allCards := cmaj.GetAllPai()
+	for _, v := range allCards {
+		if v.GetColor() != Color_Feng {
+			continue
+		}
+		if v.GetValue() != cmaj.QuanFeng {
+			continue
+		}
+		count := 0
+		for _, k := range allCards {
+			if v.Equal(k) {
+				count++
+			}
+		}
+		if count >= 3 {
+			return true
+		}
+	}
+	return false
+}
+
+//三元刻
+func (cmaj *CMaj) Check_SYK() bool {
+
+	//由中、发、白三张相同的牌组成的刻子。
+
+	allCards := cmaj.GetAllPai()
+
+	for _, v := range allCards {
+		if v.GetColor() != Color_Zfb {
+			continue
+		}
+
+		count := 0
+		for _, k := range allCards {
+			if v.Equal(k) {
+				count++
+			}
+		}
+		if count >= 3 {
+			return true
+		}
+	}
+	return false
+}
+
+//幺刻九
+func (cmaj *CMaj) Check_YKJ() bool {
+
+	//幺刻九,手上有 9或1序数的 刻子（杠）
+
+	allCards := cmaj.GetAllPai()
+
+	for _, v := range allCards {
+		if v.GetColor() > Color_Tiao {
+			continue
+		}
+
+		if v.GetValue() != 1 && v.GetValue() != 9 {
+			continue
+		}
+		count := 0
+		for _, k := range allCards {
+			if v.Equal(k) {
+				count++
+			}
+		}
+		if count >= 3 {
+			return true
+		}
+	}
+	return false
+}
+
+//三色三同顺
+func (cmaj *CMaj) Check_SSSTS(_calHuInfo *CalHuInfo) bool {
+
+	//三个花色不同，序数相同的顺子
+	sunWanArr := make([][]int, 0)
+	sunTongArr := make([][]int, 0)
+	sunTiaoArr := make([][]int, 0)
+
+	for _, v := range _calHuInfo.PxList {
+		if len(v) > 2 {
+			for i := 0; i < len(v)-2; i += 3 {
+				if GetColor(v[i]) == Color_Wan {
+					if CheckABCPai(v[i], v[i+1], v[i+2]) {
+						sunWanArr = append(sunWanArr, []int{v[i], v[i+1], v[i+2]})
+					}
+				}
+				if GetColor(v[i]) == Color_Tong {
+					if CheckABCPai(v[i], v[i+1], v[i+2]) {
+						sunTongArr = append(sunTongArr, []int{v[i], v[i+1], v[i+2]})
+					}
+				}
+				if GetColor(v[i]) == Color_Tiao {
+					if CheckABCPai(v[i], v[i+1], v[i+2]) {
+						sunTiaoArr = append(sunTiaoArr, []int{v[i], v[i+1], v[i+2]})
+					}
+				}
+			}
+		}
+	}
+
+	if len(sunWanArr) == 0 || len(sunTongArr) == 0 || len(sunTiaoArr) == 0 {
+		return false
+	}
+
+	for _, wan := range sunWanArr {
+		eqTong := false
+		eqTiao := false
+		for _, tong := range sunTongArr {
+			if GetVal(wan[0]) == GetVal(tong[0]) {
+				eqTong = true
+				break
+			}
+		}
+		for _, tiao := range sunTiaoArr {
+			if GetVal(wan[0]) == GetVal(tiao[0]) {
+				eqTiao = true
+				break
+			}
+		}
+
+		if eqTiao && eqTong {
+			return true
+		}
+	}
+	return false
+}
+
+//一般高
+func (cmaj *CMaj) Check_YiBanGao(_calHuInfo *CalHuInfo) bool {
+	ybgct := 0
+	shunArr := cmaj.GetShunZiArr(_calHuInfo.PxList)
+	logs.Info("shunArr---%v", shunArr)
+	for _, v := range shunArr {
+		if len(v) < 6 {
+			continue
+		} else {
+			for i := 0; i < (len(v) - 5); {
+				if _calHuInfo.CheckAABBCCPai_hy(v[i], v[i+1], v[i+2], v[i+3], v[i+4], v[i+5]) &&
+					GetVal(v[i]) == GetVal(v[i+3]) && GetVal(v[i+1]) == GetVal(v[i+4]) && GetVal(v[i+2]) == GetVal(v[i+5]) {
+					logs.Info("------%v,%v,%v,%v,%v,%v,", v[i], v[i+1], v[i+2], v[i+3], v[i+4], v[i+5])
+					ybgct++
+					return true
+
+				} else {
+					i += 3
+
+				}
+			}
+		}
+
+	}
+	keZiArr := cmaj.GetKeZiArr(_calHuInfo.PxList)
+	for _, v := range keZiArr {
+		if len(v) < 9 {
+			continue
+		} else {
+			for i := 0; i < (len(v) - 6); {
+				if _calHuInfo.CheckABCPai_hy(v[i], v[i+3], v[i+6]) {
+					ybgct++
+					return true
+				} else {
+					i += 3
+
+				}
+			}
+		}
+
+	}
+
+	if ybgct > 0 {
+		return true
+	}
+	return false
+}
+func (cmaj *CMaj) Check_YiBanGao_7DUI(_calHuInfo *CalHuInfo) bool {
+	ybgct := 0
+	shunArr := make([][]int, 0)
+	shunArr = append(shunArr, DataToVal(_calHuInfo.WanIntArr))
+	shunArr = append(shunArr, DataToVal(_calHuInfo.TongIntArr))
+	shunArr = append(shunArr, DataToVal(_calHuInfo.TiaoIntArr))
+	//shunArr[0] = DataToVal(_calHuInfo.WanIntArr)
+	//shunArr[1] = DataToVal(_calHuInfo.TongIntArr)
+	//shunArr[2] = DataToVal(_calHuInfo.TiaoIntArr)
+	for _, v := range shunArr {
+		if len(v) < 6 {
+			continue
+		} else {
+			// 四张一样的去除两个
+			_tempval := make([]int, 0)
+			for i := 0; i < len(v); {
+				if HasElementCt(v, v[i]) == 4 {
+					_tempval = append(_tempval, v[i])
+					_tempval = append(_tempval, v[i])
+					i += 4
+				} else {
+					_tempval = append(_tempval, v[i])
+					i++
+				}
+			}
+			if len(_tempval) < 6 {
+				continue
+			}
+			_ybgArr := make([]int, 0)
+			for i := 0; i < len(_tempval); {
+				if _tempval[i] == (_tempval[i+2]-1) && _tempval[i+2] == (_tempval[i+4]-1) {
+					for j := i; j < (i + 6); j++ {
+						_ybgArr = append(_ybgArr, _tempval[j])
+					}
+					ybgct++
+					//i += 6
+					break
+				} else {
+					i++
+					if (len(_tempval) - i) < 6 {
+						break
+					}
+				}
+			}
+			if len(_ybgArr) == 6 && len(v) >= 12 {
+				// 去重
+				_partArr := make([]int, 0)
+				_partArr = DeletePartArr(v, _ybgArr)
+				for i := 0; i < len(_partArr); {
+					if _partArr[i] == (_partArr[i+2]-1) && _partArr[i+2] == (_partArr[i+4]-1) {
+						ybgct++
+						break
+					} else {
+						i++
+						if (len(_partArr) - i) < 6 {
+							break
+						}
+					}
+				}
+			}
+		}
+
+	}
+
+	if ybgct > 0 {
+		return true
+	}
+	return false
+}
+
+//一台花检测
+func (cmaj *CMaj) Check_YTH() bool {
+
+	//拥有梅兰竹菊，或者春夏秋冬
+
+	hasMei := false
+	hasLan := false
+	hasZu := false
+	hasJu := false
+
+	hasChun := false
+	hasXia := false
+	hasQiu := false
+	hasDong := false
+
+	for _, v := range cmaj.HuaPaiArr {
+		if v.EqualByData(140) {
+			hasMei = true
+		}
+		if v.EqualByData(141) {
+			hasLan = true
+		}
+		if v.EqualByData(142) {
+			hasZu = true
+		}
+		if v.EqualByData(143) {
+			hasJu = true
+		}
+
+		if v.EqualByData(136) {
+			hasChun = true
+		}
+		if v.EqualByData(137) {
+			hasXia = true
+		}
+		if v.EqualByData(138) {
+			hasQiu = true
+		}
+		if v.EqualByData(139) {
+			hasDong = true
+		}
+
+	}
+
+	return (hasChun && hasXia && hasQiu && hasDong) || (hasMei && hasLan && hasZu && hasJu)
+}
+
+//三暗刻检测
+func (cmaj *CMaj) Check_SanAK() bool {
+
+	//三个暗刻（大于三个计四暗刻）（杠），必须在手上，
+	handCards := cmaj.GetHandPai()
+	anKeCt := 0
+	for _, v := range handCards {
+		cardCount := 0
+		for _, k := range handCards {
+			if v.Equal(k) {
+				cardCount++
+			}
+		}
+		if cardCount >= 3 {
+			anKeCt++
+		}
+	}
+	if anKeCt == 3 {
+		return true
+	}
+	return false
+
+}
+
+//三同刻检测
+func (cmaj *CMaj) Check_STK() bool {
+
+	//三个（大于等于三个）序数相同的刻子(杠)。
+
+	if len(cmaj.GangPaiArr) < 3 {
+		return false
+	}
+	gangCards := make([]*MCard, 0)
+	for _, v := range cmaj.GangPaiArr {
+		if len(v) > 0 {
+			gangCards = append(gangCards, v[0])
+		}
+	}
+
+	for _, v := range gangCards {
+		count := 0
+		for _, k := range gangCards {
+			if v.Equal(k) {
+				count++
+			}
+		}
+		if count >= 3 {
+			return true
+		}
+	}
+	return false
+}
+
 //全带幺检测
 func (cmaj *CMaj) Check_QDY(calHuInfo *CalHuInfo) bool {
 	jiang := cmaj.GetJiangPai(calHuInfo.PxList)
@@ -1738,115 +2140,6 @@ func (cmaj *CMaj) Check_DanDiao() bool {
 		return false
 	}
 	return true
-}
-
-//一般高
-func (cmaj *CMaj) Check_YiBanGao(_calHuInfo *CalHuInfo) int {
-	ybgct := 0
-	shunArr := cmaj.GetShunZiArr(_calHuInfo.PxList)
-	logs.Info("shunArr---%v", shunArr)
-	for _, v := range shunArr {
-		if len(v) < 6 {
-			continue
-		} else {
-			for i := 0; i < (len(v) - 5); {
-				if _calHuInfo.CheckAABBCCPai_hy(v[i], v[i+1], v[i+2], v[i+3], v[i+4], v[i+5]) &&
-					GetVal(v[i]) == GetVal(v[i+3]) && GetVal(v[i+1]) == GetVal(v[i+4]) && GetVal(v[i+2]) == GetVal(v[i+5]) {
-					logs.Info("------%v,%v,%v,%v,%v,%v,", v[i], v[i+1], v[i+2], v[i+3], v[i+4], v[i+5])
-					ybgct++
-					return ybgct
-
-				} else {
-					i += 3
-
-				}
-			}
-		}
-
-	}
-	keZiArr := cmaj.GetKeZiArr(_calHuInfo.PxList)
-	for _, v := range keZiArr {
-		if len(v) < 9 {
-			continue
-		} else {
-			for i := 0; i < (len(v) - 6); {
-				if _calHuInfo.CheckABCPai_hy(v[i], v[i+3], v[i+6]) {
-					ybgct++
-					return ybgct
-				} else {
-					i += 3
-
-				}
-			}
-		}
-
-	}
-	return ybgct
-}
-func (cmaj *CMaj) Check_YiBanGao_7DUI(_calHuInfo *CalHuInfo) int {
-	ybgct := 0
-	shunArr := make([][]int, 0)
-	shunArr = append(shunArr, DataToVal(_calHuInfo.WanIntArr))
-	shunArr = append(shunArr, DataToVal(_calHuInfo.TongIntArr))
-	shunArr = append(shunArr, DataToVal(_calHuInfo.TiaoIntArr))
-	//shunArr[0] = DataToVal(_calHuInfo.WanIntArr)
-	//shunArr[1] = DataToVal(_calHuInfo.TongIntArr)
-	//shunArr[2] = DataToVal(_calHuInfo.TiaoIntArr)
-	for _, v := range shunArr {
-		if len(v) < 6 {
-			continue
-		} else {
-			// 四张一样的去除两个
-			_tempval := make([]int, 0)
-			for i := 0; i < len(v); {
-				if HasElementCt(v, v[i]) == 4 {
-					_tempval = append(_tempval, v[i])
-					_tempval = append(_tempval, v[i])
-					i += 4
-				} else {
-					_tempval = append(_tempval, v[i])
-					i++
-				}
-			}
-			if len(_tempval) < 6 {
-				continue
-			}
-			_ybgArr := make([]int, 0)
-			for i := 0; i < len(_tempval); {
-				if _tempval[i] == (_tempval[i+2]-1) && _tempval[i+2] == (_tempval[i+4]-1) {
-					for j := i; j < (i + 6); j++ {
-						_ybgArr = append(_ybgArr, _tempval[j])
-					}
-					ybgct++
-					//i += 6
-					break
-				} else {
-					i++
-					if (len(_tempval) - i) < 6 {
-						break
-					}
-				}
-			}
-			if len(_ybgArr) == 6 && len(v) >= 12 {
-				// 去重
-				_partArr := make([]int, 0)
-				_partArr = DeletePartArr(v, _ybgArr)
-				for i := 0; i < len(_partArr); {
-					if _partArr[i] == (_partArr[i+2]-1) && _partArr[i+2] == (_partArr[i+4]-1) {
-						ybgct++
-						break
-					} else {
-						i++
-						if (len(_partArr) - i) < 6 {
-							break
-						}
-					}
-				}
-			}
-		}
-
-	}
-	return ybgct
 }
 
 //四归一(杠不算四归一)

@@ -5,10 +5,10 @@ package maj
 import (
 	"strings"
 
+	"qianuuu.com/lib/logs"
 	"qianuuu.com/xgmj/internal/config"
 	"qianuuu.com/xgmj/internal/consts"
 	. "qianuuu.com/xgmj/internal/mjcomn"
-	"qianuuu.com/lib/logs"
 )
 
 // Majong 一局牌管理
@@ -46,10 +46,12 @@ type Majong struct {
 	YiPaoDXSeatID   int //如果本局有一炮多响,标记一炮多响的放炮位置
 	LastHuCardData  int //最近一个胡牌牌值,用于判断是否 一炮多响
 	FatchLastSeatID int //拿最后一张牌的位置id
+	HaiDi           bool
 
-	Flow   int //是否流局
-	GameCt int //已玩局数
-	HuSeq  int //记录胡牌顺序(包括接炮\自摸)
+	Flow     int //是否流局
+	GameCt   int //已玩局数
+	QuanFeng int //圈风
+	HuSeq    int //记录胡牌顺序(包括接炮\自摸)
 
 }
 
@@ -99,6 +101,7 @@ func (m *Majong) Init() {
 	m.HuSeq = 0
 	m.ZhuaNiaoInfo = NewZhuaNiao()
 	m.LaiZiCardData = consts.DefaultIndex
+	m.HaiDi = false
 	logs.Info("-------------------11111------->m.LaiZiCardData:%v", m.LaiZiCardData)
 
 }
@@ -379,6 +382,42 @@ func (m *Majong) DealCard() {
 		handpai := m.CMajArr[i].HandPaiArr
 		logs.Info("座位%v的手牌为：%v", i, handpai)
 	}
+}
+
+func (m *Majong) GetMenFeng(seatId int) int {
+
+	if seatId == m.DSeatID {
+		return m.QuanFeng
+	}
+
+	nextid1 := m.GetNextSeatID(m.DSeatID)
+	nextid2 := m.GetNextSeatID(nextid1)
+	nextid3 := m.GetNextSeatID(nextid2)
+
+	if nextid1 == seatId {
+		return m.GetNextFeng(m.QuanFeng)
+	}
+	if nextid2 == seatId {
+		qf := m.GetNextFeng(m.QuanFeng)
+		return m.GetNextFeng(qf)
+	}
+	if nextid3 == seatId {
+		qf := m.GetNextFeng(m.QuanFeng)
+		qf1 := m.GetNextFeng(qf)
+		return m.GetNextFeng(qf1)
+	}
+	return 1
+}
+
+func (m *Majong) GetNextFeng(qf int) int {
+
+	feng := m.QuanFeng + 1
+
+	if feng == 5 {
+		return 1
+	}
+
+	return feng
 }
 
 func (m *Majong) FetchTest() []*MCard {
@@ -897,11 +936,11 @@ func (m *Majong) ResetTestData() {
 		//{"1条", "1条", "1条", "2条", "2条", "2条", "3条", "3条", "3条", "4条", "4条", "南", "1筒","9条"},
 		//{ "1条", "1条", "2条", "2条","3条", "3条", "4条", "5条", "6条", "6条", "6条", "9条","9条"}}
 
-	//测试牌,连续 碰-取消  胡取消
-	{"中", "中", "中", "2万", "2万", "2万", "3万", "3万", "3万", "4万", "4万", "4万", "5万", "9条", "5万"},
-	{"1筒", "1筒", "1筒", "2筒", "2筒", "2筒", "3筒", "3筒", "3筒", "4筒", "4筒", "4筒", "5筒"},
-	{"1条", "1条", "1条", "2条", "2条", "2条", "3条", "3条", "3条", "4条", "4条", "8条", "9条"},
-	{"7万", "7万", "7万", "8万", "8万", "8万", "9万", "9万", "9万", "6筒", "6筒", "7条", "8条", "4万"}}
+		//测试牌,连续 碰-取消  胡取消
+		{"中", "中", "中", "2万", "2万", "2万", "3万", "3万", "3万", "4万", "4万", "4万", "5万", "9条", "5万"},
+		{"1筒", "1筒", "1筒", "2筒", "2筒", "2筒", "3筒", "3筒", "3筒", "4筒", "4筒", "4筒", "5筒"},
+		{"1条", "1条", "1条", "2条", "2条", "2条", "3条", "3条", "3条", "4条", "4条", "8条", "9条"},
+		{"7万", "7万", "7万", "8万", "8万", "8万", "9万", "9万", "9万", "6筒", "6筒", "7条", "8条", "4万"}}
 
 	//{"中", "中", "中", "1万", "2万", "2万", "2万", "4筒", "5筒", "6筒", "4条", "4条", "4条", "6万"},
 	//{"1筒", "1筒", "1筒", "2筒", "2筒", "2筒", "3筒", "3筒", "3筒", "4筒", "4筒", "4筒", "5筒"},

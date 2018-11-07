@@ -141,6 +141,21 @@ func GetHuPxScore_FYMJ(_pxIndex int) int {
 	return []int{0, 0, 1}[_pxIndex]
 }
 
+const (
+	PXID_XGMJ_PINGHU  = 1  //平胡
+	PXID_XGMJ_HAIDIHU = 30 //海底胡
+	PXID_XGMJ_QQR     = 31 //全求人
+	PXID_XGMJ_MENQING = 32 //门清
+
+)
+
+const (
+	DongFeng = 1 //东
+	NanFeng  = 2 //南
+	XiFeng   = 3 //西
+	BeiFeng  = 4 //北
+)
+
 // 怀远麻将胡牌牌型\分数  ----------------------------------------------------------------------------
 const (
 	PXID_HYMJ_PINGHU     = 1  //平胡

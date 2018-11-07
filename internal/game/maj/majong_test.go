@@ -40,7 +40,17 @@ func TestMajong(t *testing.T) {
 
 	cmaj := &CMaj{}
 
-	cmaj.HandPaiArr = [][]*mjcomn.MCard{}
-	fmt.Println(mjcomn.GetVal(114))
+	cal := &mjcomn.CalHuInfo{
+		PxList: [][]int{{1, 3, 9, 13, 17, 21}, {36, 40, 44, 48, 52, 56}, {72, 76, 80, 84, 88, 92}},
+	}
+
+	for _, v := range cal.PxList {
+		for _, k := range v {
+			fmt.Print(mjcomn.NewMCard(k))
+		}
+		fmt.Println()
+	}
+	fmt.Println(cmaj.Check_SSSTS(cal))
+	fmt.Println(mjcomn.GetVal(108), mjcomn.NewMCard(108))
 
 }
