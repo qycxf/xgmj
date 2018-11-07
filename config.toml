@@ -22,8 +22,8 @@ OpenReConnect = true
 OpenCharge = false
 
 CloseAutoRobot = true
-CloseTest = true
-CloseTestPx = false
+CloseTest = false
+CloseTestPx = true
 
 
 

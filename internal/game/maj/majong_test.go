@@ -4,6 +4,7 @@ import (
 	"testing"
 
 	"fmt"
+	"qianuuu.com/xgmj/internal/consts"
 	"qianuuu.com/xgmj/internal/mjcomn"
 )
 
@@ -52,5 +53,11 @@ func TestMajong(t *testing.T) {
 	}
 	fmt.Println(cmaj.Check_SSSTS(cal))
 	fmt.Println(mjcomn.GetVal(108), mjcomn.NewMCard(108))
+	fmt.Println()
+
+	fmt.Println()
+	for i := 1; i < 36; i++ {
+		fmt.Println(consts.GetHuPxName_XGMJ(i), ":", consts.GetHuPxScore_XGMJ(i))
+	}
 
 }

@@ -1,11 +1,11 @@
 package table
 
 import (
+	"qianuuu.com/lib/logs"
 	"qianuuu.com/xgmj/internal/config"
 	"qianuuu.com/xgmj/internal/consts"
 	"qianuuu.com/xgmj/internal/game/seat"
 	. "qianuuu.com/xgmj/internal/mjcomn"
-	"qianuuu.com/lib/logs"
 )
 
 // [蚌埠麻将] 牌桌
@@ -654,9 +654,9 @@ func (t *HYTable) Check_PxId(_seatId int, _calHuInfo *CalHuInfo) bool {
 	//一般高
 	yiBanGaoCt := 0
 	if _calHuInfo.PxType == PXTYPE_7DUI {
-		yiBanGaoCt = huCmaj.Check_YiBanGao_7DUI(_calHuInfo)
+		//		yiBanGaoCt = huCmaj.Check_YiBanGao_7DUI(_calHuInfo)
 	} else {
-		yiBanGaoCt = huCmaj.Check_YiBanGao(_calHuInfo)
+		//yiBanGaoCt = huCmaj.Check_YiBanGao(_calHuInfo)
 	}
 	if yiBanGaoCt > 0 {
 		for i := 0; i < yiBanGaoCt; i++ {

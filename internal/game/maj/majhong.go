@@ -395,28 +395,29 @@ func (m *Majong) GetMenFeng(seatId int) int {
 	nextid3 := m.GetNextSeatID(nextid2)
 
 	if nextid1 == seatId {
-		return m.GetNextFeng(m.QuanFeng)
+		qf := m.GetNextFeng(m.QuanFeng)
+		qf1 := m.GetNextFeng(qf)
+		return m.GetNextFeng(qf1)
+
 	}
 	if nextid2 == seatId {
 		qf := m.GetNextFeng(m.QuanFeng)
 		return m.GetNextFeng(qf)
 	}
 	if nextid3 == seatId {
-		qf := m.GetNextFeng(m.QuanFeng)
-		qf1 := m.GetNextFeng(qf)
-		return m.GetNextFeng(qf1)
+		return m.GetNextFeng(m.QuanFeng)
 	}
 	return 1
 }
 
 func (m *Majong) GetNextFeng(qf int) int {
 
-	feng := m.QuanFeng + 1
+	feng := qf - 1
 
-	if feng == 5 {
-		return 1
+	if feng == 0 {
+		return 4
 	}
-
+	logs.Info("Xxxxxx")
 	return feng
 }
 

@@ -4,10 +4,10 @@ import (
 	"fmt"
 	"runtime"
 
-	"qianuuu.com/xgmj/internal/config"
 	"qianuuu.com/lib/logs"
 	"qianuuu.com/lib/util"
 	"qianuuu.com/player"
+	"qianuuu.com/xgmj/internal/config"
 )
 
 // Tables 桌子管理
@@ -39,8 +39,8 @@ func (ts *Tables) ReadRange(fn func(tid int, table *Table)) {
 			tbs = append(tbs, t.(*HZTable).Table)
 		case *FYTable:
 			tbs = append(tbs, t.(*FYTable).Table)
-		case *BBTable:
-			tbs = append(tbs, t.(*BBTable).Table)
+		case *XGTable:
+			tbs = append(tbs, t.(*XGTable).Table)
 		case *HYTable:
 			tbs = append(tbs, t.(*HYTable).Table)
 		default:
@@ -64,8 +64,8 @@ func (ts *Tables) GetTable(_tableID int) *Table {
 		return t.(*HZTable).Table
 	case *FYTable:
 		return t.(*FYTable).Table
-	case *BBTable:
-		return t.(*BBTable).Table
+	case *XGTable:
+		return t.(*XGTable).Table
 	case *HYTable:
 		return t.(*HYTable).Table
 	default:
@@ -164,16 +164,16 @@ func (ts *Tables) CreateFYTable(_tableCfg *config.TableCfg) *FYTable {
 	return table
 }
 
-// 创建蚌埠麻将桌子
-func (ts *Tables) CreateBBTable(_tableCfg *config.TableCfg) *BBTable {
+// 创建香港麻将桌子
+func (ts *Tables) CreateXGTable(_tableCfg *config.TableCfg) *XGTable {
 
 	tableId := _tableCfg.TableId
 	//tableId := ts.CreateTableID()
 	_tableCfg.TableId = tableId
-	logs.Info("tableId: %v--------------->创建新的 [蚌埠麻将] 桌子  ", tableId)
+	logs.Info("tableId: %v--------------->创建新的 [香港麻将] 桌子  ", tableId)
 
 	// 创建并启动一个桌子
-	table := NewBBTable(tableId, ts.Robots, _tableCfg)
+	table := NewXGTable(tableId, ts.Robots, _tableCfg)
 	table.handler = ts.MsgHandler
 
 	go func() {

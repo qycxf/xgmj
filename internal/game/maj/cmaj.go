@@ -2077,6 +2077,31 @@ func (cmaj *CMaj) Check_BB_BuHua() bool {
 }
 
 // 补花检测
+func (cmaj *CMaj) Check_XG_BuHua() bool {
+	//东风、红中、发财、白板作为花牌，放置到手牌最右侧
+	cmaj.TempBuHuaArr = make([]*MCard, 0)
+	//cmaj.SortHandPai()
+	//cmaj.TempBuHuaArr = make([]*MCard, 0)
+	//
+	ct := 0
+	//遍历手牌,如果手中有同花色\值的牌 则可面杠
+	handpai := cmaj.GetHandPai()
+	//for i := 0; i < len(handpai); i ++
+	for _, v := range handpai {
+		if v.IsXGHuaPai() {
+			ct++
+			cmaj.BuHua.HandHuaCards = append(cmaj.BuHua.HandHuaCards, v.GetData())
+			cmaj.TempBuHuaArr = append(cmaj.TempBuHuaArr, v)
+		}
+	}
+
+	if ct > 0 {
+		return true
+	}
+	return false
+}
+
+// 补花检测
 func (cmaj *CMaj) Check_HY_BuHua(fengLing int) bool {
 	//东风、红中、发财、白板作为花牌，放置到手牌最右侧
 	cmaj.TempBuHuaArr = make([]*MCard, 0)

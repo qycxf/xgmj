@@ -2,13 +2,13 @@ package protoapi
 
 import (
 	"golang.org/x/protobuf/proto"
+	"qianuuu.com/lib/logs"
+	"qianuuu.com/player"
 	"qianuuu.com/xgmj/internal/config"
 	"qianuuu.com/xgmj/internal/consts"
 	"qianuuu.com/xgmj/internal/game/table"
 	"qianuuu.com/xgmj/internal/mjcomn"
 	"qianuuu.com/xgmj/internal/protobuf"
-	"qianuuu.com/lib/logs"
-	"qianuuu.com/player"
 )
 
 //玩家创建桌子
@@ -61,7 +61,7 @@ func CreateTable(cmd *protobuf.RequestCmd, TableMap *table.Tables, playerSvr pla
 	_fenging := int32(cmd.GetCrateTable().GetFengLing())            // 怀远麻将,是否带风令
 	_baoTing := int32(cmd.GetCrateTable().GetBaoTing())             // 怀远麻将,是否报听
 	_wuHuaGuo := int32(cmd.GetCrateTable().GetWuHuaGuo())           // 怀远麻将,是否有无花果选项
-	_PayWay:=int32(cmd.GetCrateTable().GetPayWay())//付费方式
+	_PayWay := int32(cmd.GetCrateTable().GetPayWay())               //付费方式
 
 	_tableConfig := config.NewTableCfg()
 	_tableConfig.TableType = int(_tableType)
@@ -83,29 +83,29 @@ func CreateTable(cmd *protobuf.RequestCmd, TableMap *table.Tables, playerSvr pla
 	_tableConfig.KaiHuSuanGang = int(_kaiHuSuanGang)
 	_tableConfig.YouGangYouFen = int(_youGangYouFen)
 	_tableConfig.CreaterId = _player.ID() //保存创建者uid
-   _tableConfig.PayWay=int(_PayWay)
+	_tableConfig.PayWay = int(_PayWay)
 	_tableConfig.DaiHua = int(_daiHua)
 	_tableConfig.FengLing = int(_fenging)
 	_tableConfig.BaoTing = int(_baoTing)
 	_tableConfig.WuHuaGuo = int(_wuHuaGuo)
 
 	//创建牌桌参数验证
-	if _tableType != mjcomn.TableType_BBMJ &&
-		_tableType != mjcomn.TableType_HYMJ {
-		result = consts.ErrorCreateTableType
-		errfunc(result)
-		return
-	}
+	//if _tableType != mjcomn.TableType_BBMJ &&
+	//	_tableType != mjcomn.TableType_HYMJ {
+	//	result = consts.ErrorCreateTableType
+	//	errfunc(result)
+	//	return
+	//}
 
 	//点炮胡\自摸胡 有且仅选一个
-	if _tableType == mjcomn.TableType_HYMJ {
-		if _dianpaoHu == int32(consts.Yes) && _zimoHu == int32(consts.Yes) ||
-			_dianpaoHu == int32(consts.No) && _zimoHu == int32(consts.No) {
-			result = consts.ErrorCreateTableSelectParam
-			errfunc(result)
-			return
-		}
-	}
+	//if _tableType == mjcomn.TableType_HYMJ {
+	//	if _dianpaoHu == int32(consts.Yes) && _zimoHu == int32(consts.Yes) ||
+	//		_dianpaoHu == int32(consts.No) && _zimoHu == int32(consts.No) {
+	//		result = consts.ErrorCreateTableSelectParam
+	//		errfunc(result)
+	//		return
+	//	}
+	//}
 
 	//验证合肥麻将
 	//if _tableType == mjcomn.TableType_BBMJ {
@@ -179,7 +179,7 @@ func CreateTable(cmd *protobuf.RequestCmd, TableMap *table.Tables, playerSvr pla
 			_tableConfig.AvgPerCard = int(2)
 		}
 
-	} else if _tableType == mjcomn.TableType_BBMJ {
+	} else if _tableType == mjcomn.TableType_XGMJ {
 		if _gameCt == 6 {
 			_tableConfig.FangKa = 1 * int(_playerCt)
 			_tableConfig.AvgPerCard = int(1)
@@ -219,9 +219,9 @@ func CreateTable(cmd *protobuf.RequestCmd, TableMap *table.Tables, playerSvr pla
 			table.PresentUID = _player.ID() //保存赠送者uid
 		} else {
 			//创建房间,平摊房卡
-			if  _tableConfig.PayWay==0{
+			if _tableConfig.PayWay == 0 {
 				needKaCt = _tableConfig.AvgPerCard
-			}else{
+			} else {
 				needKaCt = _tableConfig.AvgPerCard * _tableConfig.PlayerCt
 			}
 
@@ -370,13 +370,13 @@ func CreateByType(TableMap *table.Tables, _tableCfg *config.TableCfg) *table.Tab
 		_tableCfg.QiangGang = consts.Yes //可抢杠
 		table := TableMap.CreateFYTable(_tableCfg)
 		return table.Table
-	} else if _tableType == mjcomn.TableType_BBMJ { //蚌埠麻将
+	} else if _tableType == mjcomn.TableType_XGMJ { //香港麻将
 
-		_tableCfg.MaxCardColorIndex = 5  //万筒条1-9 风 中
-		_tableCfg.KehuQidui = consts.No  //不带七对
+		_tableCfg.MaxCardColorIndex = 6  //万筒条1-9 风 中
+		_tableCfg.KehuQidui = consts.Yes //不带七对
 		_tableCfg.QiangGang = consts.Yes //可抢杠
 		_tableCfg.DianpaoHu = consts.Yes
-		table := TableMap.CreateBBTable(_tableCfg)
+		table := TableMap.CreateXGTable(_tableCfg)
 		return table.Table
 	} else if _tableType == mjcomn.TableType_HYMJ { //怀远麻将
 

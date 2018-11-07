@@ -32,8 +32,9 @@ const (
 	TableType_ASMJ       = 9  // 鞍山麻将
 	TableType_GBMJ       = 10 // 国标麻将
 	TableType_AQMJ       = 11 // 安庆麻将
-	TableType_BBMJ       = 12 // 蚌埠麻将
-	TableType_HYMJ       = 13 // 怀远麻将
+	//TableType_BBMJ       = 12 // 蚌埠麻将
+	TableType_HYMJ = 13 // 怀远麻将
+	TableType_XGMJ = 14 //香港麻将
 )
 
 //返回牌桌名称

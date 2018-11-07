@@ -9,13 +9,13 @@ import (
 )
 
 // [蚌埠麻将] 牌桌
-type BBTable struct {
+type XGTable struct {
 	*Table
 }
 
-func NewBBTable(_tableID int, _robots *Robots, _tableCfg *config.TableCfg) *BBTable {
+func NewXGTable(_tableID int, _robots *Robots, _tableCfg *config.TableCfg) *XGTable {
 	table := NewTable(_tableID, _robots, _tableCfg)
-	ret := &BBTable{
+	ret := &XGTable{
 		Table: table,
 	}
 
@@ -24,7 +24,7 @@ func NewBBTable(_tableID int, _robots *Robots, _tableCfg *config.TableCfg) *BBTa
 }
 
 //玩家胡牌
-func (t *BBTable) HuPai(_seat *seat.Seat) {
+func (t *XGTable) HuPai(_seat *seat.Seat) {
 
 	seatId := _seat.GetId()
 	huCmaj := t.Majhong.CMajArr[seatId]
@@ -109,7 +109,7 @@ func (t *BBTable) HuPai(_seat *seat.Seat) {
 }
 
 //位置胡牌,计算牌型\积分等
-func (t *BBTable) calHuResult(_seat *seat.Seat) {
+func (t *XGTable) calHuResult(_seat *seat.Seat) {
 
 	huSeatID := _seat.GetId()
 	huCmaj := t.Majhong.CMajArr[huSeatID]
@@ -139,7 +139,7 @@ func (t *BBTable) calHuResult(_seat *seat.Seat) {
 		huCmaj.JiePaoCt++ //接炮次数
 
 		if len(huCmaj.GetHandPai()) == 2 && huCmaj.AnGangCt == 0 {
-			huCmaj.AddPxId(consts.PXID_XGMJ_QQR)
+			huCmaj.AddPxId(consts.PXID_XGMJ_QUANQR)
 		}
 
 		if huCmaj.Check_MQ() {
@@ -243,7 +243,7 @@ func (t *BBTable) calHuResult(_seat *seat.Seat) {
 }
 
 // 确定庄家
-func (t *BBTable) MakeDSeat() {
+func (t *XGTable) MakeDSeat() {
 
 	//测试
 	if !config.Opts().CloseTest {
@@ -308,7 +308,7 @@ func (t *BBTable) MakeDSeat() {
 }
 
 //拿牌者拿牌后开始思考  _specialPxId:某些状态下思考 带入牌型
-func (t *BBTable) FetcherStartThink(_specialPxId int) {
+func (t *XGTable) FetcherStartThink(_specialPxId int) {
 	//检测自己思考
 	isSelfThink := t.ThinkSelfPai(_specialPxId, false)
 
@@ -319,7 +319,7 @@ func (t *BBTable) FetcherStartThink(_specialPxId int) {
 		_seatId := t.Majhong.CurtSenderIndex
 		_cmaj := t.Majhong.CMajArr[_seatId]
 
-		if _cmaj.Check_BB_BuHua() && t.TableCfg.DaiHua > 0 {
+		if _cmaj.Check_XG_BuHua() && t.TableCfg.DaiHua > 0 {
 			//系统自动补花
 			t.buhuaLogic()
 		} else {
@@ -330,7 +330,7 @@ func (t *BBTable) FetcherStartThink(_specialPxId int) {
 }
 
 //拿到牌后思考自己的牌 isPeng:是否碰后思考
-func (t *BBTable) ThinkSelfPai(_specialPxId int, isPeng bool) bool {
+func (t *XGTable) ThinkSelfPai(_specialPxId int, isPeng bool) bool {
 
 	m := t.Majhong
 	m.ClearThinker()
@@ -431,7 +431,7 @@ func (t *BBTable) ThinkSelfPai(_specialPxId int, isPeng bool) bool {
 }
 
 //出牌后其他位置玩家思考
-func (t *BBTable) ThinkOtherPai(_tkCard *MCard) bool {
+func (t *XGTable) ThinkOtherPai(_tkCard *MCard) bool {
 
 	m := t.Majhong
 
@@ -558,7 +558,7 @@ func (t *BBTable) ThinkOtherPai(_tkCard *MCard) bool {
 }
 
 // 胡牌检测
-func (t *BBTable) CheckHuPai(_seatId int) bool {
+func (t *XGTable) CheckHuPai(_seatId int) bool {
 
 	if !config.Opts().OpenHu {
 		return false
@@ -579,7 +579,7 @@ func (t *BBTable) CheckHuPai(_seatId int) bool {
 	return t.Check_hupaiRule(_seatId, _calHuInfo)
 
 }
-func (t *BBTable) Check_hupaiRule(_seatId int, _calHuInfo *CalHuInfo) bool {
+func (t *XGTable) Check_hupaiRule(_seatId int, _calHuInfo *CalHuInfo) bool {
 	_cmaj := t.Majhong.CMajArr[_seatId]
 	logs.Info("tableId:%v--------CheckHuPai---------->_calHuInfo.PxType:%v", t.TableCfg.TableId, _calHuInfo.PxType)
 
@@ -607,11 +607,11 @@ func (t *BBTable) Check_hupaiRule(_seatId int, _calHuInfo *CalHuInfo) bool {
 }
 
 //获取胡牌运算对象
-func (t *BBTable) GetCalHuObject(_seatId int) *CalHuObject {
+func (t *XGTable) GetCalHuObject(_seatId int) *CalHuObject {
 
 	_mjcfg := NewMjCfg()
 	_mjcfg.TableType = t.TableCfg.TableType
-	_mjcfg.MaxColorCt = 5
+	_mjcfg.MaxColorCt = 6
 
 	_cmaj := t.Majhong.CMajArr[_seatId]
 	if t.TableCfg.KehuQidui == consts.Yes {
@@ -633,13 +633,69 @@ func (t *BBTable) GetCalHuObject(_seatId int) *CalHuObject {
 }
 
 // 胡牌牌型检测
-func (t *BBTable) Check_PxId(_seatId int, _calHuInfo *CalHuInfo) bool {
+func (t *XGTable) Check_PxId(_seatId int, _calHuInfo *CalHuInfo) bool {
 
 	huCmaj := t.Majhong.CMajArr[_seatId]
 
+	if huCmaj.Check_DSX() {
+		huCmaj.AddPxId(consts.PXID_XGMJ_DASIXI)
+		logs.Info("tableId:%v--------Check_PxId---------->大四喜", t.TableCfg.TableId)
+	}
+
+	if huCmaj.Check_DSY() {
+		huCmaj.AddPxId(consts.PXID_XGMJ_DASANYUAN)
+		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
+	}
+	if huCmaj.Check_LYS() {
+		huCmaj.AddPxId(consts.PXID_XGMJ_LVYISE)
+		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
+	}
+	if huCmaj.Check_JLBD() {
+		huCmaj.AddPxId(consts.PXID_XGMJ_JLBD)
+		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
+	}
+	if _calHuInfo.PxType == PXTYPE_SSY {
+		huCmaj.AddPxId(consts.PXID_XGMJ_SSYAO)
+		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
+	}
+
+	if huCmaj.Check_QYJ() {
+		huCmaj.AddPxId(consts.PXID_XGMJ_QINGYJIU)
+		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
+	}
+
+	if huCmaj.Check_XSX(_calHuInfo) {
+		huCmaj.AddPxId(consts.PXID_XGMJ_XIAOSX)
+		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
+	}
+	if huCmaj.Check_ZYS() {
+		huCmaj.AddPxId(consts.PXID_XGMJ_ZIYS)
+		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
+	}
+
+	if huCmaj.Check_SAK() {
+		huCmaj.AddPxId(consts.PXID_XGMJ_SIAK)
+		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
+	}
+	if ) {
+		huCmaj.AddPxId(consts.PXID_XGMJ_QINGYS)
+		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
+	}
+
+	if huCmaj.Check_QYS() {
+		huCmaj.AddPxId(consts.PXID_XGMJ_QINGYS)
+		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
+	}
+
+
+	if huCmaj.Check_QYS() {
+		huCmaj.AddPxId(consts.PXID_XGMJ_QINGYS)
+		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
+	}
+
 	//清一色
 	if huCmaj.Check_QYS() {
-		huCmaj.AddPxId(consts.PXID_HZMJ_QYS)
+		huCmaj.AddPxId(consts.PXID_XGMJ_QINGYS)
 		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
 	}
 
@@ -689,7 +745,7 @@ func (t *BBTable) Check_PxId(_seatId int, _calHuInfo *CalHuInfo) bool {
 //}
 
 // 暗杠检测
-func (t *BBTable) Check_AnGang(_seatId int) bool {
+func (t *XGTable) Check_AnGang(_seatId int) bool {
 
 	if !config.Opts().OpenGang {
 		return false
@@ -736,7 +792,7 @@ func (t *BBTable) Check_AnGang(_seatId int) bool {
 }
 
 // 最后一个可胡玩家选择取消胡
-func (t *BBTable) LastHuThinkerCancer() {
+func (t *XGTable) LastHuThinkerCancer() {
 	logs.Info("tableId:%v-------------------> 最后一个可胡玩家选择取消胡牌")
 	t.GameOver()
 	//检测抓鸟
@@ -744,7 +800,7 @@ func (t *BBTable) LastHuThinkerCancer() {
 }
 
 //庄家第一次思考
-func (t *BBTable) DPlayerFirstThink() {
+func (t *XGTable) DPlayerFirstThink() {
 
 	//庄家开始思考 //检测天胡
 	_pxId := consts.DefaultIndex
@@ -758,7 +814,7 @@ func (t *BBTable) DPlayerFirstThink() {
 }
 
 // 等待出牌->听牌检测
-func (t *BBTable) SendCheckTing() {
+func (t *XGTable) SendCheckTing() {
 
 	_seatId := t.Majhong.CurtSenderIndex
 	_cmaj := t.Majhong.CMajArr[_seatId]
@@ -803,7 +859,7 @@ func (t *BBTable) SendCheckTing() {
 }
 
 // 更新位置当前听牌
-func (t *BBTable) UpdateTingCards(_seatId int) {
+func (t *XGTable) UpdateTingCards(_seatId int) {
 
 	_cmaj := t.Majhong.CMajArr[_seatId]
 	//先清空听牌,有可能打完牌后不听牌
@@ -829,7 +885,7 @@ func (t *BBTable) UpdateTingCards(_seatId int) {
 }
 
 //玩家杠牌
-func (t *BBTable) Gang(_seatId int, _data int, _isSave bool) {
+func (t *XGTable) Gang(_seatId int, _data int, _isSave bool) {
 
 	_cmaj := t.Majhong.CMajArr[_seatId]
 	_gangCard := NewMCard(_data)
@@ -940,7 +996,7 @@ func (t *BBTable) Gang(_seatId int, _data int, _isSave bool) {
 }
 
 //玩家面杠操作后,查看其他位置是否抢杠胡 _gangSeatID:面杠操作的位置id
-func (t *BBTable) ThinkQiangGangHu(_gangSeatID int, _tkCard *MCard) bool {
+func (t *XGTable) ThinkQiangGangHu(_gangSeatID int, _tkCard *MCard) bool {
 
 	m := t.Majhong
 	seatThink := make([]bool, 4)
@@ -1013,7 +1069,7 @@ func (t *BBTable) ThinkQiangGangHu(_gangSeatID int, _tkCard *MCard) bool {
 }
 
 //单局计算
-func (t *BBTable) CalSingle() {
+func (t *XGTable) CalSingle() {
 
 	//无人胡牌,不计算分数,流局 -----------------------------------------------------------------------------
 	if t.GetHasHuCt() == 0 {
@@ -1051,7 +1107,7 @@ func (t *BBTable) CalSingle() {
 }
 
 //玩家碰牌
-func (t *BBTable) Peng(_seatId int) {
+func (t *XGTable) Peng(_seatId int) {
 
 	//碰牌操作检测过手胡
 	t.chkGSH(_seatId)
@@ -1069,7 +1125,7 @@ func (t *BBTable) Peng(_seatId int) {
 }
 
 //一局游戏开始
-func (t *BBTable) GameStart() {
+func (t *XGTable) GameStart() {
 
 	if t.Majhong.GameCt == 0 {
 		t.Majhong.GameCt++ //游戏局数+1 (第一局 游戏开始时增加)
@@ -1086,9 +1142,11 @@ func (t *BBTable) GameStart() {
 		t.Majhong.CMajArr[i].GameCt = t.Majhong.GameCt
 		t.Majhong.CMajArr[i].QuanFeng = t.Majhong.QuanFeng
 		t.Majhong.CMajArr[i].DseatId = t.Majhong.DSeatID
-		t.Majhong.CMajArr[i].QuanFeng = t.Majhong.GetMenFeng(i)
+		t.Majhong.CMajArr[i].MenFeng = t.Majhong.GetMenFeng(i)
+		logs.Info("门风", t.Majhong.CMajArr[i].MenFeng)
 	}
 
+	logs.Info("-------------------------- 第:%v开始!庄家位置,圈风", t.ID, t.Majhong.GameCt, t.Majhong.DSeatID, t.Majhong.QuanFeng)
 	//确定完庄家后再 清除部分上一局用于下局判断庄家位置的的临时数据
 	t.Majhong.ClearLastTmpData()
 
@@ -1127,7 +1185,7 @@ func GetQuanFeng(gameCount int) int {
 }
 
 //检测单局游戏结束,牌墙中没有牌则结束游戏,这个方法只在自己拿完最后一张无思考或者有思考但放弃时调用
-func (t *BBTable) ChkOver() bool {
+func (t *XGTable) ChkOver() bool {
 	remainPaiCt := t.Majhong.GetRemainPaiCt()
 	res := 0
 	if t.TableCfg.DaiHua <= 0 {

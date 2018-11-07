@@ -7,6 +7,10 @@ import (
 	"time"
 
 	"golang.org/x/protobuf/proto"
+	"qianuuu.com/hall/lib/gath"
+	"qianuuu.com/lib/logs"
+	"qianuuu.com/lib/util"
+	"qianuuu.com/player"
 	"qianuuu.com/xgmj/internal/config"
 	"qianuuu.com/xgmj/internal/consts"
 	"qianuuu.com/xgmj/internal/game/protoapi"
@@ -17,10 +21,6 @@ import (
 	"qianuuu.com/xgmj/internal/protobuf"
 	"qianuuu.com/xgmj/internal/redig"
 	"qianuuu.com/xgmj/qo"
-	"qianuuu.com/hall/lib/gath"
-	"qianuuu.com/lib/logs"
-	"qianuuu.com/lib/util"
-	"qianuuu.com/player"
 )
 
 // MsgHandler 消息处理接口
@@ -553,6 +553,7 @@ func (g *Game) SendTableInfo(_table *table.Table) {
 	_table.GetSeats().Foreach(func(key int, seat *seat.Seat) {
 
 		player := seat.GetPlayer()
+
 		_nameArr = append(_nameArr, player.String())
 		if !player.IsRobot() { //机器人消息 不发送
 			_tableInfo := protobuf.Helper.GetTableInfo(_table, player.ID())
@@ -560,7 +561,7 @@ func (g *Game) SendTableInfo(_table *table.Table) {
 			for i := 0; i < len(_tableInfo.SeatInfo); i++ { //不发送其他玩家的手牌
 				if int(_tableInfo.SeatInfo[i].PlayerInfo.GetUid()) != player.ID() {
 					handcardLen := len(_tableInfo.SeatInfo[i].GetHandCards())
-					if (handcardLen > 0 && _table.GetState() != consts.TableStateShowResult) {
+					if handcardLen > 0 && _table.GetState() != consts.TableStateShowResult {
 						//logs.Info("修改前的手牌  id:%v   手牌:%v", i, _tableInfo.SeatInfo[i].GetHandCards())
 						handCard := _tableInfo.SeatInfo[i].GetHandCards()
 						for i := 0; i < handcardLen; i++ {
@@ -771,30 +772,32 @@ func (g *Game) testLogic() {
 	//g.TableMap.CreateHZTable(_tableCfg)
 
 	//[怀远麻将]牌桌
-	_tableCfg := config.NewTableCfg()
-	_tableCfg.TableType = mjcomn.TableType_HYMJ
-	_tableCfg.RobotCt = 2
-	_tableCfg.MaxCardColorIndex = 6
-	_tableCfg.PlayerCt = 2
-	_tableCfg.GameCt = 1
-	_tableCfg.BaseScore = 1
-	_tableCfg.WuHuaGuo = 0
-	_tableCfg.FengLing = consts.Yes
-	_tableCfg.DianpaoHu = consts.Yes
-	_tableCfg.KehuQidui = consts.Yes
-	_tableCfg.TiandiHu = consts.Yes
-	g.TableMap.CreateHYTable(_tableCfg)
+	//_tableCfg := config.NewTableCfg()
+	//_tableCfg.TableType = mjcomn.TableType_HYMJ
+	//_tableCfg.RobotCt = 2
+	//
+	//_tableCfg.PlayerCt = 2
+	//_tableCfg.GameCt = 1
+	//_tableCfg.BaseScore = 1
+	//_tableCfg.WuHuaGuo = 0
+	//_tableCfg.FengLing = consts.Yes
+	//_tableCfg.DianpaoHu = consts.Yes
+	//_tableCfg.KehuQidui = consts.Yes
+	//_tableCfg.TiandiHu = consts.Yes
+	//g.TableMap.CreateHYTable(_tableCfg)
 
 	////[蚌埠麻将]牌桌
-	//	_tableCfg := config.NewTableCfg()
-	//	_tableCfg.TableType = mjcomn.TableType_BBMJ
-	//	_tableCfg.RobotCt = 4
-	//	_tableCfg.PlayerCt = 1
-	//	_tableCfg.BaseScore = 1
-	//	_tableCfg.DaiHua = consts.Yes
-	//	_tableCfg.DianpaoHu = consts.Yes
-	//	_tableCfg.TiandiHu = consts.Yes
-	//	g.TableMap.CreateBBTable(_tableCfg)
+
+	_tableCfg := config.NewTableCfg()
+	_tableCfg.TableType = mjcomn.TableType_XGMJ
+	_tableCfg.MaxCardColorIndex = 6
+	_tableCfg.RobotCt = 4
+	_tableCfg.PlayerCt = 4
+	_tableCfg.BaseScore = 1
+	_tableCfg.DaiHua = consts.Yes
+	_tableCfg.DianpaoHu = consts.Yes
+	_tableCfg.TiandiHu = consts.Yes
+	g.TableMap.CreateXGTable(_tableCfg)
 
 }
 

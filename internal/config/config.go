@@ -10,8 +10,8 @@ import (
 	"io/ioutil"
 	"os"
 
-	"qianuuu.com/xgmj/internal/mjcomn"
 	"qianuuu.com/lib/logs"
+	"qianuuu.com/xgmj/internal/mjcomn"
 
 	"github.com/BurntSushi/toml"
 	"qianuuu.com/xgmj/internal/consts"
@@ -132,7 +132,7 @@ func ParseToml(file string) error {
 func (tc *TableCfg) GetItype() int {
 	//1:房卡场(预留字段)  10:好友场  11:菜鸟场12:平民场13:进阶场14:欢乐场15:龙虎场16:高手场
 
-	if tc.TableType == mjcomn.TableType_BBMJ {
+	if tc.TableType == mjcomn.TableType_XGMJ {
 		return 1
 	}
 	//} else if tc.TableClass == pkcomn.TableClass_Coin {
@@ -175,7 +175,7 @@ type TableCfg struct {
 
 	FangKa     int //所需房卡数
 	AvgPerCard int //平均房卡数
-	PayWay int//付费方式
+	PayWay     int //付费方式
 
 }
 

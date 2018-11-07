@@ -142,12 +142,60 @@ func GetHuPxScore_FYMJ(_pxIndex int) int {
 }
 
 const (
-	PXID_XGMJ_PINGHU  = 1  //平胡
-	PXID_XGMJ_HAIDIHU = 30 //海底胡
-	PXID_XGMJ_QQR     = 31 //全求人
-	PXID_XGMJ_MENQING = 32 //门清
+	PXID_XGMJ_PINGHU    = 1 //平胡
+	PXID_XGMJ_DASIXI    = 2 //大四喜
+	PXID_XGMJ_DASANYUAN = 3 //大三元
+	PXID_XGMJ_LVYISE    = 4 //绿一色
+	PXID_XGMJ_JLBD      = 5 //九莲宝灯
+	PXID_XGMJ_SIGANG    = 6 //四杠
+	PXID_XGMJ_SSYAO     = 7 //十三幺
+	PXID_XGMJ_QINGYJIU  = 8 //清幺九
+	PXID_XGMJ_XIAOSX    = 9 //小四喜
+
+	PXID_XGMJ_ZIYS   = 10 //字一色
+	PXID_XGMJ_SIAK   = 11 //四暗刻
+	PXID_XGMJ_QINGYS = 12 //清一色
+	PXID_XGMJ_QXBK   = 13 //七星不靠
+	PXID_XGMJ_QIDUI  = 14 //七对
+	PXID_XGMJ_DDH    = 15 //对对胡
+	PXID_XGMJ_HUNYS  = 16 //混一色
+
+	PXID_XGMJ_XIAOSY  = 17 //小三元
+	PXID_XGMJ_HUNYJ   = 18 //混幺九
+	PXID_XGMJ_QINGL   = 19 //清龙
+	PXID_XGMJ_SANGANG = 20 //三杠
+	PXID_XGMJ_QUANDY  = 21 //全带幺
+	PXID_XGMJ_SANTK   = 22 //三同刻
+	PXID_XGMJ_SANANK  = 23 //三暗刻
+	PXID_XGMJ_YITH    = 24 //一台花
+
+	PXID_XGMJ_YIBG    = 25 //一般高
+	PXID_XGMJ_SSSTS   = 26 //三色三同顺
+	PXID_XGMJ_HAIDIHU = 27 //海底胡
+	PXID_XGMJ_GANGSH  = 28 //杠上花
+	PXID_XGMJ_QIANGGH = 29 //抢杠胡
+	PXID_XGMJ_YAOJK   = 30 //幺九刻
+	PXID_XGMJ_QUANQR  = 31 //全求人
+	PXID_XGMJ_SANYP   = 32 //三元牌
+
+	PXID_XGMJ_QUANFK  = 33 //圈风刻
+	PXID_XGMJ_MENFK   = 34 //门风刻
+	PXID_XGMJ_MENQING = 35 //门前清
+	PXID_XGMJ_DUANYAO = 36 //断幺
 
 )
+
+//特殊牌型
+func GetHuPxName_XGMJ(_pxIndex int) string {
+	return []string{"", "平胡", "大四喜", "大三元", "绿一色", "九莲宝灯", "四杠", "十三幺", "清幺九", "小四喜", "字一色", "四暗刻", "清一色", "七星不靠", "七对", "对对胡",
+		"混一色", "小三元", "混幺九", "清龙", "三杠", "全带幺", "三同刻", "三暗刻", "一台花", "一般高", "三色三同顺", "海底胡", "杠上花", "抢杠胡", "幺九刻", "全求人",
+		"三元牌", "圈风刻", "门前清", "断幺"}[_pxIndex]
+}
+
+//特殊牌型分数
+func GetHuPxScore_XGMJ(_pxIndex int) int {
+	return []int{0, 0, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 7, 5, 4, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}[_pxIndex]
+}
 
 const (
 	DongFeng = 1 //东

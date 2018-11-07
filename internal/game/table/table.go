@@ -193,9 +193,7 @@ func (t *Table) Serve() {
 						//}
 						//庄家开始思考
 						bu := true
-						if t.TableCfg.TableType == TableType_BBMJ && t.TableCfg.DaiHua <= 0 {
-							bu = false
-						}
+
 						if bu {
 							time.Sleep(time.Second * 1)
 							t.LunLiuBuHua()
@@ -852,8 +850,8 @@ func (t *Table) LunLiuBuHua() {
 			}
 			_cmaj := t.Majhong.CMajArr[seatIdArr[i]]
 			_cmaj.BuHua = maj.NewBuHua() //清空花牌
-			if t.TableCfg.TableType == TableType_BBMJ {
-				_cmaj.Check_BB_BuHua()
+			if t.TableCfg.TableType == TableType_XGMJ {
+				_cmaj.Check_XG_BuHua()
 			} else if t.TableCfg.TableType == TableType_HYMJ {
 				_cmaj.Check_HY_BuHua(t.TableCfg.FengLing)
 			}
@@ -861,8 +859,8 @@ func (t *Table) LunLiuBuHua() {
 			logs.Info("tableId:%v==========================位置：%v补花", t.TableCfg.TableId, seatIdArr[i])
 
 			_cmaj.BuHua = maj.NewBuHua() //清空花牌
-			if t.TableCfg.TableType == TableType_BBMJ {
-				_cmaj.Check_BB_BuHua()
+			if t.TableCfg.TableType == TableType_XGMJ {
+				_cmaj.Check_XG_BuHua()
 			} else if t.TableCfg.TableType == TableType_HYMJ {
 				_cmaj.Check_HY_BuHua(t.TableCfg.FengLing)
 			}
@@ -954,8 +952,8 @@ func (t *Table) BuHuaCards(cmajs *maj.CMaj, seatBuHua *maj.BuHua) {
 	ct := 0
 	for _, v := range cmajs.GetHandPai() {
 		ishua := false
-		if t.TableCfg.TableType == TableType_BBMJ {
-			ishua = v.IsBBHuaPai()
+		if t.TableCfg.TableType == TableType_XGMJ {
+			ishua = v.IsXGHuaPai()
 		} else if t.TableCfg.TableType == TableType_HYMJ {
 			ishua = v.IsHYHuaPai(t.TableCfg.FengLing)
 		}
@@ -1101,10 +1099,8 @@ func (t *Table) send(_seat *seat.Seat, _paiData int) {
 
 	} else {
 		ishua := false
-		if t.TableCfg.TableType == TableType_BBMJ && t.TableCfg.DaiHua > 0 {
-			ishua = sendCard.IsBBHuaPai()
-		} else if t.TableCfg.TableType == TableType_HYMJ {
-			ishua = sendCard.IsHYHuaPai(t.TableCfg.FengLing)
+		if t.TableCfg.TableType == TableType_XGMJ {
+			ishua = sendCard.IsXGHuaPai()
 		}
 		if ishua {
 			t.Majhong.CMajArr[seatID].AddHuaPaiArr(sendCard)
@@ -1464,9 +1460,9 @@ func (t *Table) buhuaLogic() {
 		_cmaj := t.Majhong.CMajArr[lastFatchId]
 
 		lastFatchCard := t.Majhong.LastFetchMCard
-		if t.TableCfg.TableType == TableType_BBMJ && t.TableCfg.DaiHua > 0 {
+		if t.TableCfg.TableType == TableType_XGMJ {
 
-			if lastFatchCard.IsBBHuaPai() {
+			if lastFatchCard.IsXGHuaPai() {
 				t.Majhong.LastSendCard = lastFatchCard.Clone() //保存这张牌
 				t.Majhong.LastSenderSeatID = lastFatchId       //保存这张牌
 
@@ -1484,7 +1480,7 @@ func (t *Table) buhuaLogic() {
 				//发送出牌动作
 				if t.Majhong.GetRemainPaiCt() > 0 {
 					t.playerFetchPai(false)
-					t.tableInter.FetcherStartThink(HUTYPE_DETAIL_GANG_SHANG_HUA)
+					t.tableInter.FetcherStartThink(consts.DefaultIndex)
 					t.SendTableInfo()
 				} else {
 					t.GameOver()
