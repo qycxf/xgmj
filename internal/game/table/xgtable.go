@@ -124,6 +124,7 @@ func (t *XGTable) calHuResult(_seat *seat.Seat) {
 		if huTypeDetail == HUTYPE_DETAIL_QIANGGANG {
 			loseSeatIDArr = append(loseSeatIDArr, t.Majhong.LastMianGangSeatID)
 			t.Majhong.CMajArr[t.Majhong.LastMianGangSeatID].DianPaoCt++ //点炮次数
+			huCmaj.AddPxId(consts.PXID_XGMJ_QIANGGH)
 
 			//点杠花 -接炮
 		} else if huTypeDetail == HUTYPE_DETAIL_GANG_SHANG_PAO {
@@ -131,6 +132,8 @@ func (t *XGTable) calHuResult(_seat *seat.Seat) {
 			t.Majhong.CMajArr[t.Majhong.LastDianZhiGangSeatID].DianPaoCt++ //点炮次数
 
 			//普通胡牌
+		} else if huTypeDetail == HUTYPE_DETAIL_GANG_SHANG_HUA {
+
 		} else {
 			loseSeatIDArr = append(loseSeatIDArr, t.Majhong.LastSenderSeatID)
 			t.Majhong.CMajArr[t.Majhong.LastSenderSeatID].DianPaoCt++ //点炮次数
@@ -162,9 +165,9 @@ func (t *XGTable) calHuResult(_seat *seat.Seat) {
 	//积分计算 胡牌基础分数  ----------------------------------------------------------------
 	totalScore := 0  //总分
 	zhuangScore := 1 // 庄家输赢+-1
-	baseScore := 1   //点炮基础分
+	baseScore := 0   //点炮基础分
 	if huType == HUTYPE_ZIMO {
-		baseScore = 2 //自摸1分
+		baseScore = 0 //自摸1分
 	}
 
 	//胡牌基础分-----------------------------------
@@ -177,6 +180,18 @@ func (t *XGTable) calHuResult(_seat *seat.Seat) {
 		huCmaj.AddPxScore("自摸", baseScore)
 	}
 	totalScore += baseScore
+
+	//牌型分数-----------------------------------
+	for _, v := range huCmaj.HuPxIdArr {
+		if v != consts.PXID_HYMJ_PINGHU { //平胡的分数已经算在baseScore中,其他牌型另加分
+			pxName := consts.GetHuPxName_XGMJ(v)
+			pxScore := consts.GetHuPxScore_XGMJ(v)
+			totalScore += pxScore
+			huCmaj.AddPxScore(pxName, pxScore)
+			logs.Info("tableId:%v--------calHuResult 牌型计算-----pxName:%v,pxScore:%v---->",
+				t.TableCfg.TableId, pxName, pxScore)
+		}
+	}
 	//庄分数-----------------------------------
 	if t.Majhong.DSeatID == huSeatID {
 		totalScore += zhuangScore
@@ -592,15 +607,21 @@ func (t *XGTable) Check_hupaiRule(_seatId int, _calHuInfo *CalHuInfo) bool {
 		}
 	}
 	if _calHuInfo.PxType > PXTYPE_UNKNOW {
-		//t.Check_PxId(_seatId, _calHuInfo)
+		t.Check_PxId(_seatId, _calHuInfo)
 		if _calHuInfo.PxType == PXTYPE_PINGHU {
 			_cmaj.AddPxId(consts.PXID_HYMJ_PINGHU)
 			logs.Info("tableId:%v--------CheckHuPai---------->平胡胡牌", t.TableCfg.TableId)
 
 		}
-		//if len(_cmaj.HuPxIdArr) > 0  {
-		return true
-		//}
+		if len(_cmaj.HuPxIdArr) > 0 {
+			score := 0
+			for _, v := range _cmaj.HuPxIdArr {
+				score += consts.GetHuPxScore_XGMJ(v)
+				if score >= 3 {
+					return true
+				}
+			}
+		}
 	}
 
 	return false
@@ -644,42 +665,42 @@ func (t *XGTable) Check_PxId(_seatId int, _calHuInfo *CalHuInfo) bool {
 
 	if huCmaj.Check_DSY() {
 		huCmaj.AddPxId(consts.PXID_XGMJ_DASANYUAN)
-		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
+		logs.Info("tableId:%v--------Check_PxId---------->大三元", t.TableCfg.TableId)
 	}
 	if huCmaj.Check_LYS() {
 		huCmaj.AddPxId(consts.PXID_XGMJ_LVYISE)
-		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
+		logs.Info("tableId:%v--------Check_PxId---------->绿一色", t.TableCfg.TableId)
 	}
 	if huCmaj.Check_JLBD() {
 		huCmaj.AddPxId(consts.PXID_XGMJ_JLBD)
-		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
+		logs.Info("tableId:%v--------Check_PxId---------->九莲宝灯", t.TableCfg.TableId)
+	}
+	if huCmaj.Check_SIGANG() {
+		huCmaj.AddPxId(consts.PXID_XGMJ_SIGANG)
+		logs.Info("tableId:%v--------Check_PxId---------->四杠", t.TableCfg.TableId)
 	}
 	if _calHuInfo.PxType == PXTYPE_SSY {
 		huCmaj.AddPxId(consts.PXID_XGMJ_SSYAO)
-		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
+		logs.Info("tableId:%v--------Check_PxId---------->十三幺", t.TableCfg.TableId)
 	}
 
 	if huCmaj.Check_QYJ() {
 		huCmaj.AddPxId(consts.PXID_XGMJ_QINGYJIU)
-		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
+		logs.Info("tableId:%v--------Check_PxId---------->清幺九", t.TableCfg.TableId)
 	}
 
 	if huCmaj.Check_XSX(_calHuInfo) {
 		huCmaj.AddPxId(consts.PXID_XGMJ_XIAOSX)
-		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
+		logs.Info("tableId:%v--------Check_PxId---------->小四喜", t.TableCfg.TableId)
 	}
 	if huCmaj.Check_ZYS() {
 		huCmaj.AddPxId(consts.PXID_XGMJ_ZIYS)
-		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
+		logs.Info("tableId:%v--------Check_PxId---------->字一色", t.TableCfg.TableId)
 	}
 
 	if huCmaj.Check_SAK() {
 		huCmaj.AddPxId(consts.PXID_XGMJ_SIAK)
-		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
-	}
-	if ) {
-		huCmaj.AddPxId(consts.PXID_XGMJ_QINGYS)
-		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
+		logs.Info("tableId:%v--------Check_PxId---------->四暗刻", t.TableCfg.TableId)
 	}
 
 	if huCmaj.Check_QYS() {
@@ -687,29 +708,107 @@ func (t *XGTable) Check_PxId(_seatId int, _calHuInfo *CalHuInfo) bool {
 		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
 	}
 
-
-	if huCmaj.Check_QYS() {
-		huCmaj.AddPxId(consts.PXID_XGMJ_QINGYS)
-		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
+	if _calHuInfo.PxType == PXTYPE_SSL {
+		huCmaj.AddPxId(consts.PXID_XGMJ_QXBK)
+		logs.Info("tableId:%v--------Check_PxId---------->七星不靠", t.TableCfg.TableId)
 	}
 
-	//清一色
-	if huCmaj.Check_QYS() {
-		huCmaj.AddPxId(consts.PXID_XGMJ_QINGYS)
-		logs.Info("tableId:%v--------Check_PxId---------->清一色", t.TableCfg.TableId)
+	if _calHuInfo.PxType == PXTYPE_7DUI {
+		huCmaj.AddPxId(consts.PXID_XGMJ_QIDUI)
+		logs.Info("tableId:%v--------Check_PxId---------->七对", t.TableCfg.TableId)
 	}
 
 	//对对胡
 	if huCmaj.Check_DDHu(_calHuInfo) {
-		huCmaj.AddPxId(consts.PXID_HZMJ_DDH)
+		huCmaj.AddPxId(consts.PXID_XGMJ_DDH)
 		logs.Info("tableId:%v--------Check_PxId---------->对对胡", t.TableCfg.TableId)
+	}
+	//对对胡
+	if huCmaj.Check_HYS() {
+		huCmaj.AddPxId(consts.PXID_XGMJ_HUNYS)
+		logs.Info("tableId:%v--------Check_PxId---------->混一色", t.TableCfg.TableId)
+	}
+	//
+	if huCmaj.Check_XSY(_calHuInfo) {
+		huCmaj.AddPxId(consts.PXID_XGMJ_XIAOSY)
+		logs.Info("tableId:%v--------Check_PxId---------->小三元", t.TableCfg.TableId)
+	}
+
+	if huCmaj.Check_HYJ(_calHuInfo) {
+		huCmaj.AddPxId(consts.PXID_XGMJ_HUNYJ)
+		logs.Info("tableId:%v--------Check_PxId---------->混幺九", t.TableCfg.TableId)
+	}
+
+	if huCmaj.Check_QL() {
+		huCmaj.AddPxId(consts.PXID_XGMJ_QINGL)
+		logs.Info("tableId:%v--------Check_PxId---------->青龙", t.TableCfg.TableId)
+	}
+
+	if huCmaj.Check_SG() {
+		huCmaj.AddPxId(consts.PXID_XGMJ_SANGANG)
+		logs.Info("tableId:%v--------Check_PxId---------->三杠", t.TableCfg.TableId)
+	}
+
+	if huCmaj.Check_QDY(_calHuInfo) {
+		huCmaj.AddPxId(consts.PXID_XGMJ_QUANDY)
+		logs.Info("tableId:%v--------Check_PxId---------->全带幺", t.TableCfg.TableId)
+	}
+
+	if huCmaj.Check_STK(_calHuInfo) {
+		huCmaj.AddPxId(consts.PXID_XGMJ_SANTK)
+		logs.Info("tableId:%v--------Check_PxId---------->三同刻", t.TableCfg.TableId)
+	}
+
+	if huCmaj.Check_SanAK() {
+		huCmaj.AddPxId(consts.PXID_XGMJ_SANANK)
+		logs.Info("tableId:%v--------Check_PxId---------->三暗刻", t.TableCfg.TableId)
+	}
+	if huCmaj.Check_YTH() {
+		huCmaj.AddPxId(consts.PXID_XGMJ_YITH)
+		logs.Info("tableId:%v--------Check_PxId---------->一台花", t.TableCfg.TableId)
+	}
+	if huCmaj.Check_YiBanGao(_calHuInfo) {
+		huCmaj.AddPxId(consts.PXID_XGMJ_YIBG)
+		logs.Info("tableId:%v--------Check_PxId---------->一般高", t.TableCfg.TableId)
+	}
+	if huCmaj.Check_YiBanGao_7DUI(_calHuInfo) {
+		huCmaj.AddPxId(consts.PXID_XGMJ_YIBG)
+		logs.Info("tableId:%v--------Check_PxId---------->七对一般高", t.TableCfg.TableId)
+	}
+
+	if huCmaj.Check_SSSTS(_calHuInfo) {
+		huCmaj.AddPxId(consts.PXID_XGMJ_SSSTS)
+		logs.Info("tableId:%v--------Check_PxId---------->三色三同顺", t.TableCfg.TableId)
 	}
 
 	if t.Majhong.HaiDi {
 		huCmaj.AddPxId(consts.PXID_XGMJ_HAIDIHU)
 		logs.Info("tableId:%v--------Check_PxId----------海底胡", t.TableCfg.TableId)
 	}
-
+	if huCmaj.Check_YJK() {
+		huCmaj.AddPxId(consts.PXID_XGMJ_YAOJK)
+		logs.Info("tableId:%v--------Check_PxId---------->幺九刻", t.TableCfg.TableId)
+	}
+	if huCmaj.Check_SYK() {
+		huCmaj.AddPxId(consts.PXID_XGMJ_SANYP)
+		logs.Info("tableId:%v--------Check_PxId---------->三元刻", t.TableCfg.TableId)
+	}
+	if huCmaj.Check_QFK() {
+		huCmaj.AddPxId(consts.PXID_XGMJ_QUANFK)
+		logs.Info("tableId:%v--------Check_PxId---------->圈风刻", t.TableCfg.TableId)
+	}
+	if huCmaj.Check_MFK() {
+		huCmaj.AddPxId(consts.PXID_XGMJ_MENFK)
+		logs.Info("tableId:%v--------Check_PxId---------->门风刻", t.TableCfg.TableId)
+	}
+	if huCmaj.Check_MQ() {
+		huCmaj.AddPxId(consts.PXID_XGMJ_MENQING)
+		logs.Info("tableId:%v--------Check_PxId---------->门清", t.TableCfg.TableId)
+	}
+	if huCmaj.Check_DUANYAO() {
+		huCmaj.AddPxId(consts.PXID_XGMJ_DUANYAO)
+		logs.Info("tableId:%v--------Check_PxId---------->断幺", t.TableCfg.TableId)
+	}
 	return false
 }
 

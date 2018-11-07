@@ -1274,7 +1274,7 @@ func (cmaj *CMaj) Check_SYK() bool {
 }
 
 //幺刻九
-func (cmaj *CMaj) Check_YKJ() bool {
+func (cmaj *CMaj) Check_YJK() bool {
 
 	//幺刻九,手上有 9或1序数的 刻子（杠）
 
@@ -1528,6 +1528,9 @@ func (cmaj *CMaj) Check_SanAK() bool {
 	//三个暗刻（大于三个计四暗刻）（杠），必须在手上，
 	handCards := cmaj.GetHandPai()
 	anKeCt := 0
+	sanCount := 0
+	siCount := 0
+
 	for _, v := range handCards {
 		cardCount := 0
 		for _, k := range handCards {
@@ -1535,10 +1538,14 @@ func (cmaj *CMaj) Check_SanAK() bool {
 				cardCount++
 			}
 		}
-		if cardCount >= 3 {
-			anKeCt++
+		if cardCount == 3 {
+			sanCount++
+		}
+		if cardCount == 4 {
+			siCount++
 		}
 	}
+	anKeCt = sanCount/3 + siCount/4
 	if anKeCt == 3 {
 		return true
 	}
@@ -1547,7 +1554,7 @@ func (cmaj *CMaj) Check_SanAK() bool {
 }
 
 //三同刻检测
-func (cmaj *CMaj) Check_STK() bool {
+func (cmaj *CMaj) Check_STK(_calinfo *CalHuInfo) bool {
 
 	//三个（大于等于三个）序数相同的刻子(杠)。
 
@@ -1557,21 +1564,46 @@ func (cmaj *CMaj) Check_STK() bool {
 	gangCards := make([]*MCard, 0)
 	for _, v := range cmaj.GangPaiArr {
 		if len(v) > 0 {
+			if v[0].GetColor() > Color_Tiao {
+				continue
+			}
 			gangCards = append(gangCards, v[0])
+		}
+	}
+
+	for _, v := range cmaj.PengPaiArr {
+		if v[0].GetColor() > Color_Tiao {
+			continue
+		}
+		gangCards = append(gangCards, v[0])
+	}
+
+	for _, v := range _calinfo.PxList {
+		if len(v) < 3 {
+			continue
+		}
+		for i := 0; i < len(v); i += 3 {
+			if GetColor(v[0]) > Color_Tiao {
+				continue
+			}
+			if GetVal(v[0]) == GetVal(v[1]) {
+				gangCards = append(gangCards, NewMCard(v[0]))
+			}
 		}
 	}
 
 	for _, v := range gangCards {
 		count := 0
 		for _, k := range gangCards {
-			if v.Equal(k) {
+			if v.GetValue() == k.GetValue() {
 				count++
 			}
 		}
-		if count >= 3 {
+		if count == 3 {
 			return true
 		}
 	}
+
 	return false
 }
 
@@ -1653,6 +1685,36 @@ func (cmaj *CMaj) Check_HYJ(calHuInfo *CalHuInfo) bool {
 	return true
 }
 
+//小三元检测
+func (cmaj *CMaj) Check_XSY(calHuInfo *CalHuInfo) bool {
+
+	//糊牌有箭牌的两副刻子和将牌。
+	jiang := cmaj.GetJiangPai(calHuInfo.PxList)
+
+	if jiang == nil {
+		return false
+	}
+
+	if jiang.GetColor() != Color_Zfb {
+		return false
+	}
+
+	allCards := cmaj.GetAllPai()
+
+	count := 0
+	for _, v := range allCards {
+		if v.GetColor() == Color_Zfb {
+			count++
+		}
+
+	}
+
+	if count == 8 {
+		return true
+	}
+	return false
+}
+
 //检测 清一色（2番）：全是一种花色的平胡
 func (cmaj *CMaj) Check_QYS() bool {
 	//牌全是一种花色，全字牌不计清一色
@@ -1676,6 +1738,8 @@ func (cmaj *CMaj) Check_SAK() bool {
 	//四个暗刻（杠），必须在手上，
 	handCards := cmaj.GetHandPai()
 	anKeCt := 0
+	sanCount := 0
+	siCount := 0
 	for _, v := range handCards {
 		cardCount := 0
 		for _, k := range handCards {
@@ -1683,10 +1747,15 @@ func (cmaj *CMaj) Check_SAK() bool {
 				cardCount++
 			}
 		}
-		if cardCount >= 3 {
-			anKeCt++
+		if cardCount == 3 {
+			sanCount++
+		}
+		if cardCount == 4 {
+			siCount++
 		}
 	}
+
+	anKeCt = sanCount/3 + siCount/4
 	if anKeCt == 4 {
 		return true
 	}

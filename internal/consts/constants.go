@@ -194,7 +194,7 @@ func GetHuPxName_XGMJ(_pxIndex int) string {
 
 //特殊牌型分数
 func GetHuPxScore_XGMJ(_pxIndex int) int {
-	return []int{0, 0, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 7, 5, 4, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}[_pxIndex]
+	return []int{0, 1, 13, 13, 13, 13, 13, 13, 13, 13, 13, 13, 7, 5, 4, 3, 3, 3, 3, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}[_pxIndex]
 }
 
 const (
